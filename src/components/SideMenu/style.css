@@ -1,0 +1,14 @@
+.side-menu {
+  @apply transition-all z-50 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
+}
+
+.side-menu__wrapper {
+}
+
+.side-menu__list {
+  @apply overflow-y-auto overflow-x-hidden h-screen;
+}
+
+.side-menu__item {
+  @apply border-b border-gray-800;
+}

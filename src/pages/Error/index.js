@@ -2,5 +2,9 @@ import React from "react";
 import "./style.css";
 
 export default function Error() {
-  return <></>;
+  return (
+    <>
+      <div className="error-page"></div>
+    </>
+  );
 }

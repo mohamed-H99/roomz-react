@@ -1,0 +1,23 @@
+.chat-form {
+  @apply h-20 px-8 w-full flex justify-center items-center;
+}
+
+.chat-form__wrapper {
+  @apply w-full;
+}
+
+.chat-form__group {
+  @apply flex justify-between items-center gap-2;
+}
+
+.chat-form__control {
+  @apply p-4 rounded-xl shadow w-full;
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.chat-form__btn {
+  @apply inline-block w-28 uppercase shadow font-bold bg-indigo-500 text-white p-4 rounded-xl;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}

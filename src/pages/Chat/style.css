@@ -1,0 +1,5 @@
+.chat-page {}
+
+.chat-page__wrapper {
+  @apply w-screen h-screen max-w-full max-h-full;
+}
