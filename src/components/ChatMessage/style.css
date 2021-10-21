@@ -1,0 +1,41 @@
+.chat-message {
+  @apply w-full mb-4;
+}
+
+.chat-message__wrapper {
+  @apply flex justify-start items-start gap-2;
+}
+
+.chat-message__self .chat-message__wrapper {
+  @apply flex-row-reverse;
+}
+
+.chat-message__avatar-wrapper {
+  min-width: 2rem;
+}
+
+.chat-message__self .chat-message__avatar-wrapper {
+  @apply hidden;
+}
+
+.chat-message__avatar {
+  @apply w-8 h-8 rounded-xl;
+}
+
+.chat-message__content-wrapper {
+}
+
+.chat-message__content {
+  @apply px-4 py-2 bg-white text-gray-900 rounded-xl shadow;
+  border-start-start-radius: 0;
+}
+
+.chat-message__self .chat-message__content {
+  @apply bg-indigo-600 text-white;
+  border-start-end-radius: 0;
+  border-start-start-radius: 0.75rem;
+}
+
+.chat-message__date {
+  @apply text-xs text-gray-400 self-end;
+}

@@ -5,10 +5,37 @@
 .side-menu__wrapper {
 }
 
+.side-menu__form {
+  @apply w-full h-16 p-4 border-l-4 border-transparent;
+}
+
+.side-menu__form-wrapper {
+  @apply hidden md:flex justify-between items-center h-full gap-2;
+}
+
+.side-menu__form-search {
+  @apply relative pl-8;
+}
+
+.side-menu__form-search svg {
+  @apply absolute left-0 top-1/2 opacity-60;
+  transform: translateY(-50%);
+  stroke: white;
+}
+
+.side-menu__form-control {
+  @apply bg-transparent outline-none text-white w-full;
+}
+
+.side-menu__form-btn {
+  @apply flex justify-center items-center shadow-inner bg-indigo-600 text-white rounded-full w-8 h-8;
+  min-width: 2rem;
+}
+
 .side-menu__list {
   @apply overflow-y-auto overflow-x-hidden h-screen;
 }
 
 .side-menu__item {
-  @apply border-b border-gray-800;
+  @apply border-t border-gray-800;
 }
