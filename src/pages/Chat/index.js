@@ -1,5 +1,6 @@
 import React from "react";
-import { SideMenu, ChatBox } from "../../components";
+import SideMenu from "../../components/SideMenu";
+import ChatBox from "../../components/ChatBox";
 import "./style.css";
 
 export default function Chat() {

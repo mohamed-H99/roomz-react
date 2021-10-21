@@ -1,3 +1,6 @@
 .chat-content {
-  @apply w-full h-full p-8 container mx-auto;
+  @apply w-full h-full p-8 container mx-auto overflow-y-auto;
+}
+
+.chat-content__wrapper {
 }

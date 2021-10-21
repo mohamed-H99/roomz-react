@@ -19,7 +19,7 @@
 }
 
 .chat-message__avatar {
-  @apply w-8 h-8 rounded-xl;
+  @apply w-8 h-8 rounded-full;
 }
 
 .chat-message__content-wrapper {

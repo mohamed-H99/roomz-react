@@ -36,7 +36,7 @@
 }
 
 .chat-item__img {
-  @apply rounded-xl relative w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 object-cover;
+  @apply rounded-full relative w-8 h-8 md:w-12 md:h-12 object-cover;
 }
 
 .chat-item__img::before {

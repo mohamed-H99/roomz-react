@@ -2,5 +2,21 @@
 }
 
 body {
-  overflow: hidden;
+  @apply overflow-hidden bg-gray-100;
+}
+
+.ReactModal__Overlay {
+  @apply z-50;
+}
+
+.ReactModal__Content {
+  inset: unset !important;
+  inset-inline-start: 50% !important;
+  inset-block-start: 50% !important;
+  border: 0 !important;
+  border-radius: 0.75rem !important;
+  transform: translate(-50%, -50%);
+  @apply shadow-xl;
+  width: 90%;
+  max-width: fit-content;
 }

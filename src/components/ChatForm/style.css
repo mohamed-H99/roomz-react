@@ -7,11 +7,11 @@
 }
 
 .chat-form__group {
-  @apply flex justify-between items-end h-full;
+  @apply flex justify-between items-end h-full shadow-2xl;
 }
 
 .chat-form__control {
-  @apply p-4 shadow w-full outline-none;
+  @apply p-4 w-full outline-none;
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }

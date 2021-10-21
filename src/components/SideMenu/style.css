@@ -1,12 +1,13 @@
 .side-menu {
-  @apply transition-all z-50 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
+  @apply transition-all z-10 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
 }
 
 .side-menu__wrapper {
+  @apply h-screen;
 }
 
 .side-menu__form {
-  @apply w-full h-16 p-4 border-l-4 border-transparent;
+  @apply w-full h-16 p-4 border-transparent border-b border-gray-800;
 }
 
 .side-menu__form-wrapper {
@@ -18,7 +19,7 @@
 }
 
 .side-menu__form-search svg {
-  @apply absolute left-0 top-1/2 opacity-60;
+  @apply absolute left-0 top-1/2 opacity-70 w-4;
   transform: translateY(-50%);
   stroke: white;
 }
@@ -33,9 +34,9 @@
 }
 
 .side-menu__list {
-  @apply overflow-y-auto overflow-x-hidden h-screen;
+  @apply overflow-x-hidden h-screen;
 }
 
 .side-menu__item {
-  @apply border-t border-gray-800;
+  @apply border-b border-gray-800;
 }
