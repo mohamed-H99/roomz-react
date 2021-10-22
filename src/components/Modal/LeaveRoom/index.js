@@ -1,21 +1,22 @@
 import { useContext, useState } from "react";
-import { StateContext, createRoom } from "../../../appContext";
+import { StateContext, leaveRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
-export default function JoinRoomModal({ onDiscard }) {
+export default function LeaveRoomModal({ onDiscard }) {
+  const { currentUser, activeRoom } = useContext(StateContext);
+
   const [state, setState] = useState({
     loading: false,
     name: "",
   });
 
-  const { currentUser } = useContext(StateContext);
-
-  const handleCreate = async (e) => {
+  const handleLeave = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
-    await createRoom({
-      name: state.name,
+    await leaveRoom({
+      id: activeRoom?.id,
+      reason: state.name,
       uid: currentUser?.uid,
     });
     setState({ name: "", loading: false });
@@ -34,33 +35,34 @@ export default function JoinRoomModal({ onDiscard }) {
   };
 
   return (
-    <div className="create-room-modal">
-      <div className="create-room-modal__wrapper">
-        <form className="create-room-modal__form">
-          <h2 className="create-room-modal__form-title">{"Join Room"}</h2>
-          <p className="create-room-modal__form-subtitle">
-            {"You can search by room ID."}
-          </p>
+    <div className="leave-room-modal">
+      <div className="leave-room-modal__wrapper">
+        <form className="leave-room-modal__form">
+          <h2 className="leave-room-modal__form-title">
+            {`Are you sure you want to leave ${activeRoom?.name}?`}
+          </h2>
 
-          <div className="create-room-modal__form-group">
-            <label className="create-room-modal__form-label">{"Room-ID"}</label>
+          <div className="leave-room-modal__form-group optional">
+            <label className="leave-room-modal__form-label">
+              {"Why are you leaving?"}
+            </label>
             <input
               name="name"
-              className="create-room-modal__form-control"
+              className="leave-room-modal__form-control"
               type="text"
-              placeholder=""
+              placeholder="Name.."
               value={state[`name`]}
               onChange={handleChange}
             />
           </div>
 
-          <div className="create-room-modal__form-actions">
+          <div className="leave-room-modal__form-actions">
             <Button
-              variant="primary"
+              variant="danger"
               loading={state.loading}
-              onClick={handleCreate}
+              onClick={handleLeave}
             >
-              {"Join"}
+              {"Leave"}
             </Button>
             <Button variant="light" onClick={handleDiscard}>
               {"Discard"}

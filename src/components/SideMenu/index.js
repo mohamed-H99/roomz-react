@@ -46,12 +46,13 @@ export default function SideMenu() {
         </form>
 
         <ul className="side-menu__list">
-          {rooms.length &&
-            rooms.map((room) => (
-              <li className="side-menu__item" key={room.id}>
-                <ChatItem data={room} />
-              </li>
-            ))}
+          {rooms.length
+            ? rooms.map((room) => (
+                <li className="side-menu__item" key={room.id}>
+                  <ChatItem data={room} />
+                </li>
+              ))
+            : ""}
         </ul>
       </div>
     </aside>

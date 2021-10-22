@@ -1,0 +1,40 @@
+.info-room-modal {
+}
+
+.info-room-modal__wrapper {
+  @apply p-4;
+}
+
+.info-room-modal__content {
+}
+
+.info-room-modal__content-title {
+  @apply text-3xl text-gray-700;
+}
+
+.info-room-modal__content-subtitle {
+  @apply text-gray-400 text-sm mt-2 mb-8;
+}
+
+.info-room-modal__content-group {
+  @apply flex flex-col mb-4 gap-1 justify-center items-start;
+}
+
+.info-room-modal__content-label {
+  @apply text-gray-700;
+}
+
+.info-room-modal__content-group.optional
+  .info-room-modal__content-label::after {
+  content: "*optional";
+  @apply text-gray-400 ms-1 inline-block text-xs;
+  vertical-align: text-top;
+}
+
+.info-room-modal__content-control {
+  @apply p-4 shadow rounded-xl outline-none w-full;
+}
+
+.info-room-modal__content-actions {
+  @apply flex gap-2 justify-start items-center;
+}

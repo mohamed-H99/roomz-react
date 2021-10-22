@@ -3,5 +3,5 @@
 }
 
 .chat-box__wrapper {
-  @apply h-full flex flex-col justify-between items-center;
+  @apply h-full flex flex-col justify-between items-center relative;
 }

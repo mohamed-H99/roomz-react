@@ -1,39 +1,39 @@
-.create-room-modal {
+.edit-room-modal {
 }
 
-.create-room-modal__wrapper {
+.edit-room-modal__wrapper {
   @apply p-4;
 }
 
-.create-room-modal__form {
+.edit-room-modal__form {
 }
 
-.create-room-modal__form-title {
+.edit-room-modal__form-title {
   @apply text-3xl text-gray-700;
 }
 
-.create-room-modal__form-subtitle {
+.edit-room-modal__form-subtitle {
   @apply text-gray-400 text-sm mt-2 mb-8;
 }
 
-.create-room-modal__form-group {
+.edit-room-modal__form-group {
   @apply flex flex-col mb-4 gap-1 justify-center items-start;
 }
 
-.create-room-modal__form-label {
+.edit-room-modal__form-label {
   @apply text-gray-700;
 }
 
-.create-room-modal__form-group.optional .create-room-modal__form-label::after {
+.edit-room-modal__form-group.optional .edit-room-modal__form-label::after {
   content: "*optional";
   @apply text-gray-400 ms-1 inline-block text-xs;
   vertical-align: text-top;
 }
 
-.create-room-modal__form-control {
+.edit-room-modal__form-control {
   @apply p-4 shadow rounded-xl outline-none w-full;
 }
 
-.create-room-modal__form-actions {
+.edit-room-modal__form-actions {
   @apply flex gap-2 mt-4 justify-start items-center;
 }

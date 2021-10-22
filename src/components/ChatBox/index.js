@@ -1,21 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
+import ChatHeader from "../ChatHeader";
 import ChatForm from "../ChatForm";
 import ChatContent from "../ChatContent";
 import "./style.css";
-import { StateContext } from "../../appContext";
 
 export default function ChatBox() {
-  const { activeRoom } = useContext(StateContext);
-
   return (
     <div className="chat-box">
       <div className="chat-box__wrapper">
-        {activeRoom && (
-          <>
-            <ChatContent />
-            <ChatForm />
-          </>
-        )}
+        <ChatHeader />
+        <ChatContent />
+        <ChatForm />
       </div>
     </div>
   );

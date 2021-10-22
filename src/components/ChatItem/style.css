@@ -1,12 +1,12 @@
 .chat-item {
-  @apply p-4 md:pe-6 cursor-pointer transform md:border-l-4 border-transparent hover:border-indigo-600 transition-all hover:shadow-inner hover:opacity-90 overflow-hidden;
+  @apply px-4 py-0 h-16 md:pe-6 cursor-pointer transform md:border-l-4 border-transparent hover:border-indigo-600 transition-all hover:shadow-inner hover:opacity-90 overflow-hidden;
 }
 .chat-item.active {
   @apply border-indigo-600 shadow-inner;
 }
 
 .chat-item__wrapper {
-  @apply md:flex gap-4 justify-start items-center relative;
+  @apply h-full flex md:gap-4 justify-start items-center relative;
 }
 
 .chat-item__notification {
@@ -36,7 +36,7 @@
 }
 
 .chat-item__img {
-  @apply rounded-full relative w-8 h-8 md:w-12 md:h-12 object-cover;
+  @apply rounded-full relative w-8 h-8  object-cover;
 }
 
 .chat-item__img::before {
@@ -45,7 +45,7 @@
 }
 
 .chat-item__content-wrapper {
-  flex-basis: 70%;
+  flex-basis: auto;
 }
 
 .chat-item__content {

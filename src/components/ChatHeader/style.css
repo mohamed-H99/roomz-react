@@ -1,0 +1,32 @@
+.chat-header {
+  @apply w-full h-16 py-0 px-4 bg-white shadow absolute top-0 left-0;
+}
+
+.chat-header__wrapper {
+  @apply flex gap-2 h-full justify-between items-center;
+}
+
+.chat-header__info {
+  @apply flex gap-4 justify-start items-center;
+}
+
+.chat-header__avatar-wrapper {
+  @apply w-8 h-8 md:w-12 md:h-12;
+}
+
+.chat-header__avatar {
+  @apply w-full h-full object-cover rounded-full;
+}
+
+.chat-header__content-wrapper {
+}
+
+.chat-header__content {
+}
+
+.chat-header__content-title {
+}
+
+.chat-header__content-subtitle {
+  @apply opacity-60 text-xs;
+}

@@ -12,15 +12,16 @@ export default function ChatForm() {
   const dispatch = useContext(DispatchContext);
   const state = useContext(StateContext);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const { msgInput, activeRoom } = state;
-    await sendMessageToRoomById(state.activeRoom?.messages, {
-      id: activeRoom.id,
-      author_id: state.currentUser?.uid,
-      author: state.currentUser?.displayName,
-      content: msgInput,
-    });
+    if (msgInput)
+      sendMessageToRoomById(state.activeRoom?.messages, {
+        id: activeRoom?.id,
+        author_id: state.currentUser?.uid,
+        author: state.currentUser?.displayName,
+        content: msgInput.trim(),
+      });
 
     dispatch({ type: ACTIONS.update_msg_input, payload: "" });
   };
@@ -28,7 +29,7 @@ export default function ChatForm() {
   const handleChange = (e) =>
     dispatch({
       type: ACTIONS.update_msg_input,
-      payload: e.target.value.trim(),
+      payload: e.target.value,
     });
 
   return (

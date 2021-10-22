@@ -1,24 +1,24 @@
 import { useContext, useState } from "react";
-import { StateContext, createRoom } from "../../../appContext";
+import { StateContext, editRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
-export default function JoinRoomModal({ onDiscard }) {
+export default function EditRoomModal({ onDiscard }) {
+  const { activeRoom } = useContext(StateContext);
+
   const [state, setState] = useState({
     loading: false,
-    name: "",
+    name: activeRoom?.name,
   });
 
-  const { currentUser } = useContext(StateContext);
-
-  const handleCreate = async (e) => {
+  const handleEdit = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
-    await createRoom({
+    await editRoom({
       name: state.name,
-      uid: currentUser?.uid,
+      id: activeRoom?.id,
     });
-    setState({ name: "", loading: false });
+    setState({ name: activeRoom?.name, loading: false });
     onDiscard(e);
   };
 
@@ -34,33 +34,33 @@ export default function JoinRoomModal({ onDiscard }) {
   };
 
   return (
-    <div className="create-room-modal">
-      <div className="create-room-modal__wrapper">
-        <form className="create-room-modal__form">
-          <h2 className="create-room-modal__form-title">{"Join Room"}</h2>
-          <p className="create-room-modal__form-subtitle">
-            {"You can search by room ID."}
+    <div className="edit-room-modal">
+      <div className="edit-room-modal__wrapper">
+        <form className="edit-room-modal__form">
+          <h2 className="edit-room-modal__form-title">{"Edit Room"}</h2>
+          <p className="edit-room-modal__form-subtitle">
+            {"Edit your room info."}
           </p>
 
-          <div className="create-room-modal__form-group">
-            <label className="create-room-modal__form-label">{"Room-ID"}</label>
+          <div className="edit-room-modal__form-group">
+            <label className="edit-room-modal__form-label">{"New name"}</label>
             <input
               name="name"
-              className="create-room-modal__form-control"
+              className="edit-room-modal__form-control"
               type="text"
-              placeholder=""
+              placeholder="Name.."
               value={state[`name`]}
               onChange={handleChange}
             />
           </div>
 
-          <div className="create-room-modal__form-actions">
+          <div className="edit-room-modal__form-actions">
             <Button
               variant="primary"
               loading={state.loading}
-              onClick={handleCreate}
+              onClick={handleEdit}
             >
-              {"Join"}
+              {"Edit"}
             </Button>
             <Button variant="light" onClick={handleDiscard}>
               {"Discard"}

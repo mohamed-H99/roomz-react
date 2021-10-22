@@ -26,7 +26,7 @@ export default function ChatItem({ data }) {
         <div className="chat-item__content-wrapper">
           <div className="chat-item__content">
             <h4 className="chat-item__title">{data.name}</h4>
-            <p className="chat-item__subtitle">
+            <p className={`chat-item__subtitle hidden`}>
               <span className="me-1">{""}</span>
               <span>{""}</span>
             </p>
