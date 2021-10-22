@@ -9,7 +9,7 @@ export default function ChatContent() {
   return (
     <div className="chat-content">
       <div className="chat-content__wrapper">
-        {activeRoom?.messages.map((msg, idx) => (
+        {activeRoom?.messages?.map((msg, idx) => (
           <ChatMessage
             key={idx}
             data={msg}

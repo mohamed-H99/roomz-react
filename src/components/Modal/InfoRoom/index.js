@@ -24,8 +24,6 @@ export default function InfoRoomModal({ onDiscard }) {
             {`${activeRoom?.messages.length} message${
               activeRoom?.messages.length > 1 ? "s" : ""
             }`}
-            <br />
-            {`Created ${activeRoom?.created_distance}`}
           </p>
 
           <div className="info-room-modal__content-description">{""}</div>

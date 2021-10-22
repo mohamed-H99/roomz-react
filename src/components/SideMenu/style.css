@@ -1,5 +1,5 @@
 .side-menu {
-  @apply transition-all z-10 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
+  @apply transition-all overflow-hidden z-10 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
 }
 
 .side-menu__wrapper {

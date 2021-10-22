@@ -4,22 +4,21 @@ import {
   DispatchContext,
   ACTIONS,
   StateContext,
-  sendMessageToRoomById,
+  sendMessageToRoom,
 } from "../../appContext";
 import "./style.css";
 
 export default function ChatForm() {
   const dispatch = useContext(DispatchContext);
-  const state = useContext(StateContext);
+  const { msgInput, activeRoom, currentUser } = useContext(StateContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { msgInput, activeRoom } = state;
     if (msgInput)
-      sendMessageToRoomById(state.activeRoom?.messages, {
+      await sendMessageToRoom(activeRoom?.messages, {
         id: activeRoom?.id,
-        author_id: state.currentUser?.uid,
-        author: state.currentUser?.displayName,
+        author_id: currentUser?.uid,
+        author_name: currentUser?.displayName, // [providerNaming]
         content: msgInput.trim(),
       });
 
@@ -40,7 +39,7 @@ export default function ChatForm() {
             className="chat-form__control"
             placeholder="Enter your message here.."
             onChange={handleChange}
-            value={state.msgInput}
+            value={msgInput}
           />
           <button className="chat-form__btn">
             <Send />

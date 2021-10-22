@@ -16,6 +16,7 @@ export default function CreateRoomModal({ onDiscard }) {
     setState((prev) => ({ ...prev, loading: true }));
     await createRoom({
       name: state.name,
+      uname: currentUser?.displayName, // [providerNaming]
       uid: currentUser?.uid,
     });
     setState({ name: "", loading: false });

@@ -18,7 +18,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { produce } from "immer";
-import { formatDistanceToNow } from "date-fns";
+// import { formatDistanceToNow } from "date-fns";
 
 export const StateContext = createContext();
 export const DispatchContext = createContext();
@@ -29,6 +29,7 @@ export const ACTIONS = {
   update_msg_input: "update_msg_input",
   update_current_user: "update_current_user",
   update_rooms: "update_rooms",
+  filter_rooms: "filter_rooms",
   update_active_room: "update_active_room",
   create_room: "create_room",
   join_room: "join_room",
@@ -71,45 +72,62 @@ const initialState = {
 export default function AppContextProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const getRooms = () => {
+  const fetchRooms = (client_id) => {
     const q = query(
       collection(getFirestore(), "rooms"),
       orderBy("created_at", "desc")
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const arr = [];
+      let rooms = [];
       querySnapshot.forEach((doc) => {
-        const created_distance = formatDistanceToNow(
-          doc.data()?.created_at.toDate()
-        );
-        arr.push({ ...doc.data(), id: doc.id, created_distance });
+        const admins = doc.data().admins;
+        const adminsLen = admins?.length;
+        let client_is_admin = false;
+        if (adminsLen) {
+          for (let i = 0; i < adminsLen; i++) {
+            if (admins[i].admin_id === client_id) {
+              client_is_admin = true;
+              break;
+            }
+          }
+        }
+        rooms.push({
+          ...doc.data(),
+          id: doc.id,
+          has_notification: state.activeRoom?.id !== doc.id ? true : false,
+          client_admin: client_is_admin,
+        });
       });
-      dispatch({ type: ACTIONS.update_rooms, payload: arr });
+
+      // querySnapshot.docChanges().forEach(({ type, doc }) => {
+      //   switch (type) {
+      //     case "added":
+      //       break;
+      //     case "modified":
+      //       break;
+      //     case "removed":
+      //       break;
+      //     default:
+      //       break;
+      //   }
+      // });
+
+      dispatch({ type: ACTIONS.update_rooms, payload: rooms });
     });
   };
 
-  // const getRoomById = async (id) => {
-  //   const unsub = onSnapshot(
-  //     doc(getFirestore(), "rooms", id),
-  //     { includeMetadataChanges: true },
-  //     (doc) => {
-  //       dispatch({
-  //         type: ACTIONS.update_active_room,
-  //         payload: { ...doc.data(), id: doc.id },
-  //       });
-  //     }
-  //   );
-  // };
+  const fetchMainData = () => {
+    getAuth().onAuthStateChanged((cred) => {
+      fetchRooms(cred?.uid);
+      dispatch({ type: ACTIONS.update_current_user, payload: cred });
+    });
+  };
 
   useEffect(() => {
-    getAuth().onAuthStateChanged((cred) =>
-      dispatch({ type: ACTIONS.update_current_user, payload: cred })
-    );
-
-    getRooms();
-    // if (state.activeRoom?.id) getRoomById(state.activeRoom?.id);
+    fetchMainData();
 
     return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -145,15 +163,13 @@ function reducer(state, { type, payload }) {
     case ACTIONS.update_rooms:
       return produce(state, (draftState) => {
         draftState[`rooms`] = payload;
-        if (state.activeRoom) {
-          if (!payload.length) draftState[`activeRoom`] = null;
-          else
-            payload.forEach((room) => {
-              if (room.id === state.activeRoom?.id) {
-                console.log(room.id, " = ", state.activeRoom?.id);
-                draftState[`activeRoom`] = room;
-              }
-            });
+        if (state.activeRoom && payload.length) {
+          const updatedDoc = payload.find(
+            (doc) => doc.id === state.activeRoom.id
+          );
+          draftState[`activeRoom`] = updatedDoc;
+        } else {
+          draftState[`activeRoom`] = null;
         }
       });
 
@@ -182,10 +198,17 @@ export const createRoom = (data) => {
   return setDoc(doc(collection(getFirestore(), "rooms")), {
     name: data.name,
     messages: [],
+    admins: [
+      {
+        admin_id: data.uid,
+        admin_name: data.uname,
+      },
+    ],
     members: [
       {
         member_id: data.uid,
-        admin: true,
+        member_name: data.uname,
+        is_admin: true,
       },
     ],
     created_at: Timestamp.fromDate(new Date()),
@@ -212,9 +235,9 @@ export const deleteRoom = ({ id }) => {
   return deleteDoc(roomDocRef);
 };
 
-export const sendMessageToRoomById = (
+export const sendMessageToRoom = (
   oldMessages,
-  { id, author_id, author, content }
+  { id, author_id, author_name, content }
 ) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
   return updateDoc(roomDocRef, {
@@ -222,7 +245,7 @@ export const sendMessageToRoomById = (
       ...oldMessages,
       {
         author_id,
-        author,
+        author_name,
         content,
         created_at: Timestamp.fromDate(new Date()),
       },

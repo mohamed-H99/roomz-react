@@ -14,7 +14,9 @@ export default function ChatItem({ data }) {
     <div className="chat-item" onClick={activateRoom}>
       <div className="chat-item__wrapper">
         <div className="chat-item__img-wrapper">
-          {true && <span className="chat-item__notification"></span>}
+          {data?.has_notification && (
+            <span className="chat-item__notification"></span>
+          )}
           <img
             className="chat-item__img"
             src="https://via.placeholder.com/64"

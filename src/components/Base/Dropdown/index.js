@@ -1,8 +1,8 @@
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Settings } from "react-feather";
 import { useHistory } from "react-router";
-import { ACTIONS, DispatchContext } from "../../../appContext";
+import { ACTIONS, DispatchContext, StateContext } from "../../../appContext";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -10,7 +10,25 @@ function classNames(...classes) {
 
 export default function Dropdown({ links }) {
   const dispatch = useContext(DispatchContext);
+  const { activeRoom } = useContext(StateContext);
+  const [accessibleLinks, setAccessibleLinks] = useState([]);
   const history = useHistory();
+
+  const getAccessLinks = () => {
+    if (!activeRoom.client_admin && links?.length) {
+      const newLinks = links.filter((link) => !link.admin_access);
+      setAccessibleLinks(newLinks);
+    } else {
+      setAccessibleLinks(links);
+    }
+  };
+
+  useEffect(() => {
+    getAccessLinks();
+
+    return () => setAccessibleLinks([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [links]);
 
   const handleClick = (e, action) => {
     e.preventDefault();
@@ -37,22 +55,24 @@ export default function Dropdown({ links }) {
       >
         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            {links?.map((link, idx) => (
-              <Menu.Item key={idx}>
-                {({ active }) => (
-                  <button
-                    href="#"
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm w-full text-left"
-                    )}
-                    onClick={(e) => handleClick(e, link.action)}
-                  >
-                    {link.title}
-                  </button>
-                )}
-              </Menu.Item>
-            ))}
+            {accessibleLinks.map((link, idx) => {
+              return (
+                <Menu.Item key={idx}>
+                  {({ active }) => (
+                    <button
+                      href="#"
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm w-full text-left"
+                      )}
+                      onClick={(e) => handleClick(e, link.action)}
+                    >
+                      {link.title}
+                    </button>
+                  )}
+                </Menu.Item>
+              );
+            })}
           </div>
         </Menu.Items>
       </Transition>
