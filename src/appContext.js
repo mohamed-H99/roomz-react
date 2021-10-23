@@ -8,6 +8,7 @@ import {
 import {
   collection,
   doc,
+  getDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -16,9 +17,11 @@ import {
   onSnapshot,
   query,
   orderBy,
+  where,
+  WhereFilterOp,
 } from "firebase/firestore";
 import { produce } from "immer";
-// import { formatDistanceToNow } from "date-fns";
+import { toast } from "react-toastify";
 
 export const StateContext = createContext();
 export const DispatchContext = createContext();
@@ -67,6 +70,12 @@ const initialState = {
       admin_access: true,
     },
   ],
+  errorMessages: {
+    member_exists: "Member is already exists",
+    member_not_found: "Member is not found",
+    room_exists: "Room is already exists",
+    room_not_found: "Room is not found",
+  },
 };
 
 export default function AppContextProvider({ children }) {
@@ -75,17 +84,18 @@ export default function AppContextProvider({ children }) {
   const fetchRooms = (client_id) => {
     const q = query(
       collection(getFirestore(), "rooms"),
-      orderBy("created_at", "desc")
+      orderBy("created_at", "desc"),
+      where("members_id", "array-contains", client_id)
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let rooms = [];
       querySnapshot.forEach((doc) => {
-        const admins = doc.data().admins;
-        const adminsLen = admins?.length;
+        const members = doc.data().members;
+        const membersLen = members?.length;
         let client_is_admin = false;
-        if (adminsLen) {
-          for (let i = 0; i < adminsLen; i++) {
-            if (admins[i].admin_id === client_id) {
+        if (membersLen) {
+          for (let i = 0; i < membersLen; i++) {
+            if (members[i].id === client_id && members[i].is_admin) {
               client_is_admin = true;
               break;
             }
@@ -95,7 +105,7 @@ export default function AppContextProvider({ children }) {
           ...doc.data(),
           id: doc.id,
           has_notification: state.activeRoom?.id !== doc.id ? true : false,
-          client_admin: client_is_admin,
+          client_is_admin,
         });
       });
 
@@ -183,6 +193,13 @@ function reducer(state, { type, payload }) {
   }
 }
 
+// ===============
+// basic functions
+
+export const errorMsg = (msg) => ({ type: "error", message: msg });
+
+export const successMsg = (msg) => ({ type: "success", message: msg });
+
 // ================
 // functions (auth)
 
@@ -198,16 +215,12 @@ export const createRoom = (data) => {
   return setDoc(doc(collection(getFirestore(), "rooms")), {
     name: data.name,
     messages: [],
-    admins: [
-      {
-        admin_id: data.uid,
-        admin_name: data.uname,
-      },
-    ],
+    members_id: [data.uid],
+    // admins_id: [data.uid],
     members: [
       {
-        member_id: data.uid,
-        member_name: data.uname,
+        id: data.uid,
+        name: data.uname,
         is_admin: true,
       },
     ],
@@ -215,8 +228,22 @@ export const createRoom = (data) => {
   });
 };
 
-export const joinRoom = (data) => {
-  console.log("in progress::", data);
+export const joinRoom = async ({ id, uid, uname }) => {
+  const roomDocRef = doc(getFirestore(), "rooms", id);
+  const roomDocData = (await getDoc(roomDocRef)).data();
+  if (roomDocData) {
+    const oldMembers = roomDocData.members;
+    const oldMembersId = roomDocData.members_id;
+
+    const member =
+      oldMembers.findIndex((m) => m.id === uid) === -1 ? false : true;
+    if (!member) {
+      return updateDoc(roomDocRef, {
+        members: [...oldMembers, { id: uid, name: uname, is_admin: false }],
+        members_id: [...oldMembersId, uid],
+      });
+    } else return errorMsg(initialState.errorMessages.member_exists);
+  } else return errorMsg(initialState.errorMessages.room_not_found);
 };
 
 export const editRoom = ({ id, name }) => {
@@ -226,8 +253,23 @@ export const editRoom = ({ id, name }) => {
   });
 };
 
-export const leaveRoom = (data) => {
-  console.log("in progress::", data);
+export const leaveRoom = async ({ id, uid }) => {
+  const roomDocRef = doc(getFirestore(), "rooms", id);
+  const roomDocData = (await getDoc(roomDocRef)).data();
+  if (roomDocData) {
+    const oldMembers = roomDocData.members;
+    const oldMembersId = roomDocData.members_id;
+    const member = oldMembers.find((m) => m.id === uid);
+    if (member) {
+      // && memberId
+      const newMembers = oldMembers.filter((m) => m.id !== member.id);
+      const newMembersId = oldMembersId.filter((m_id) => m_id !== member.id);
+      return updateDoc(roomDocRef, {
+        members: [...newMembers],
+        members_id: [...newMembersId],
+      });
+    } else return errorMsg(initialState.errorMessages.member_not_found);
+  } else return errorMsg(initialState.errorMessages.room_not_found);
 };
 
 export const deleteRoom = ({ id }) => {

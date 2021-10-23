@@ -12,16 +12,15 @@ export default function ChatForm() {
   const dispatch = useContext(DispatchContext);
   const { msgInput, activeRoom, currentUser } = useContext(StateContext);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (msgInput)
-      await sendMessageToRoom(activeRoom?.messages, {
+      sendMessageToRoom(activeRoom?.messages, {
         id: activeRoom?.id,
         author_id: currentUser?.uid,
         author_name: currentUser?.displayName, // [providerNaming]
         content: msgInput.trim(),
       });
-
     dispatch({ type: ACTIONS.update_msg_input, payload: "" });
   };
 

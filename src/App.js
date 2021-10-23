@@ -13,6 +13,7 @@ import EditRoomModal from "./components/Modal/EditRoom";
 import LeaveRoomModal from "./components/Modal/LeaveRoom";
 import InfoRoomModal from "./components/Modal/InfoRoom";
 import DeleteRoomModal from "./components/Modal/DeleteRoom";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const state = useContext(StateContext);
@@ -53,6 +54,8 @@ function App() {
           <DeleteRoomModal onDiscard={handleDiscard} />
         )}
       </ReactModal>
+
+      <ToastContainer />
     </>
   );
 }

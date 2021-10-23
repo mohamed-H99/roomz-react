@@ -34,7 +34,8 @@
 }
 
 .side-menu__list {
-  @apply overflow-x-hidden h-screen;
+  @apply overflow-x-hidden;
+  height: calc(100% - 4rem);
 }
 
 .side-menu__item {

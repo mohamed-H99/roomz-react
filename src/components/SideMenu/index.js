@@ -1,6 +1,5 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ChatItem from "../ChatItem";
-// import { Scrollbars } from "react-custom-scrollbars";
 import { Search, Plus, Users } from "react-feather";
 import "./style.css";
 import { ACTIONS, DispatchContext, StateContext } from "../../appContext";
@@ -9,7 +8,34 @@ import { useHistory } from "react-router";
 export default function SideMenu() {
   const dispatch = useContext(DispatchContext);
   const { rooms } = useContext(StateContext);
+  const [state, setState] = useState({
+    search: "",
+    rooms: [],
+  });
   const history = useHistory();
+
+  const handleChange = (e) =>
+    setState((prev) => ({ ...prev, search: e.target.value }));
+
+  const handleLocalSearch = (value) => {
+    let filteredRooms = [];
+    if (value) {
+      rooms.forEach((room) => {
+        const res = room.name.match(value);
+        if (res) filteredRooms.push(room);
+      });
+      setState((prev) => ({ ...prev, rooms: filteredRooms }));
+    } else {
+      setState((prev) => ({ ...prev, rooms }));
+    }
+  };
+
+  useEffect(() => {
+    handleLocalSearch(state.search.trim());
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.search, rooms]);
 
   const openModal = (e, type) => {
     e.preventDefault();
@@ -28,6 +54,7 @@ export default function SideMenu() {
                 className="side-menu__form-control"
                 type="text"
                 placeholder="Search.."
+                onChange={handleChange}
               />
             </div>
             <button
@@ -46,8 +73,8 @@ export default function SideMenu() {
         </form>
 
         <ul className="side-menu__list">
-          {rooms.length
-            ? rooms.map((room) => (
+          {state.rooms.length
+            ? state.rooms.map((room) => (
                 <li className="side-menu__item" key={room.id}>
                   <ChatItem data={room} />
                 </li>

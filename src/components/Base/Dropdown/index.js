@@ -15,7 +15,7 @@ export default function Dropdown({ links }) {
   const history = useHistory();
 
   const getAccessLinks = () => {
-    if (!activeRoom.client_admin && links?.length) {
+    if (!activeRoom.client_is_admin && links?.length) {
       const newLinks = links.filter((link) => !link.admin_access);
       setAccessibleLinks(newLinks);
     } else {

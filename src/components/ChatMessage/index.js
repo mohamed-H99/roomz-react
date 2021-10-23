@@ -20,7 +20,7 @@ export default function ChatMessage({ data, self }) {
         <div className="chat-message__content-wrapper">
           <div className="chat-message__content">{data?.content}</div>
         </div>
-        <span className="chat-message__date">{data?.dateDistance}</span>
+        <span className="chat-message__date">{dateDistance}</span>
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ export default function LeaveRoomModal({ onDiscard }) {
       <div className="leave-room-modal__wrapper">
         <form className="leave-room-modal__form">
           <h2 className="leave-room-modal__form-title">
-            {`Are you sure you want to leave ${activeRoom?.name}?`}
+            {`Are you sure you want to leave '${activeRoom?.name}'?`}
           </h2>
 
           <div className="leave-room-modal__form-group optional">
