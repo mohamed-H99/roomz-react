@@ -9,11 +9,11 @@
 }
 
 .create-room-modal__form-title {
-  @apply text-3xl text-gray-700;
+  @apply text-3xl text-gray-dark;
 }
 
 .create-room-modal__form-subtitle {
-  @apply text-gray-400 text-sm mt-2 mb-8;
+  @apply text-gray-light text-sm mt-2 mb-8;
 }
 
 .create-room-modal__form-group {
@@ -21,17 +21,17 @@
 }
 
 .create-room-modal__form-label {
-  @apply text-gray-700;
+  @apply text-gray-dark;
 }
 
 .create-room-modal__form-group.optional .create-room-modal__form-label::after {
   content: "*optional";
-  @apply text-gray-400 ms-1 inline-block text-xs;
+  @apply text-gray-light ms-1 inline-block text-xs;
   vertical-align: text-top;
 }
 
 .create-room-modal__form-control {
-  @apply p-4 shadow rounded-xl outline-none w-full;
+  @apply p-4 shadow rounded-lg outline-none w-full;
 }
 
 .create-room-modal__form-actions {

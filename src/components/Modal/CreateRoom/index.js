@@ -3,11 +3,15 @@ import { StateContext, createRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
-export default function CreateRoomModal({ onDiscard }) {
-  const [state, setState] = useState({
-    loading: false,
+const initialState = {
+  loading: false,
+  formData: {
     name: "",
-  });
+  },
+};
+
+export default function CreateRoomModal({ onDiscard }) {
+  const [state, setState] = useState(initialState);
 
   const { currentUser } = useContext(StateContext);
 
@@ -15,49 +19,56 @@ export default function CreateRoomModal({ onDiscard }) {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
     await createRoom({
-      name: state.name,
+      name: state.formData.name,
       uname: currentUser?.displayName, // [providerNaming]
       uid: currentUser?.uid,
     });
-    setState({ name: "", loading: false });
-    onDiscard(e);
+    setState(initialState);
+    onDiscard();
   };
 
   const handleDiscard = (e) => {
     e.preventDefault();
-    onDiscard(e);
+    onDiscard();
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, [name]: value }));
+    setState((prev) => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        name: value,
+      },
+    }));
   };
 
   return (
-    <div className="create-room-modal">
-      <div className="create-room-modal__wrapper">
-        <form className="create-room-modal__form">
-          <h2 className="create-room-modal__form-title">{"Create Room"}</h2>
-          <p className="create-room-modal__form-subtitle">
+    <div className="modal">
+      <div className="modal-wrapper">
+        <div className="modal-header">
+          <h2 className="modal-header__title">{"Create Room"}</h2>
+          <p className="modal-header__subtitle">
             {"Create and connect with your awesome community!"}
           </p>
+        </div>
 
-          <div className="create-room-modal__form-group">
-            <label className="create-room-modal__form-label">
-              {"Room name"}
-            </label>
+        <div className="modal-body">
+          <div className="form-group">
+            <label className="form-label">{"Room name"}</label>
             <input
               name="name"
-              className="create-room-modal__form-control"
+              className="form-control"
               type="text"
-              placeholder="Name.."
-              value={state[`name`]}
+              placeholder=""
+              value={state.formData["name"]}
               onChange={handleChange}
             />
           </div>
+        </div>
 
-          <div className="create-room-modal__form-actions">
+        <div className="modal-footer">
+          <div className="modal-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
@@ -69,7 +80,7 @@ export default function CreateRoomModal({ onDiscard }) {
               {"Discard"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

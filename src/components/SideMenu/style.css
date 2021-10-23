@@ -1,5 +1,17 @@
 .side-menu {
-  @apply transition-all overflow-hidden z-10 w-16 md:w-60 lg:w-80 max-w-full bg-gray-900 h-screen fixed top-0 left-0;
+  @apply transition-all overflow-hidden z-10 w-0 md:w-60 lg:w-80 max-w-full bg-gray-darkest h-screen fixed top-0 left-0;
+}
+
+.side-menu .side-menu__toggle {
+  @apply fixed top-2 left-2 bg-white z-50 md:hidden text-gray shadow rounded-full p-0 text-xs h-12 w-12 flex justify-center items-center;
+}
+
+.side-menu.active {
+  @apply w-full md:w-60 lg:w-80;
+}
+
+.side-menu.active .side-menu__toggle {
+  @apply hidden;
 }
 
 .side-menu__wrapper {
@@ -7,11 +19,15 @@
 }
 
 .side-menu__form {
-  @apply w-full h-16 p-4 border-transparent border-b border-gray-800;
+  @apply w-full h-16 p-4 border-transparent border-b border-gray-dark;
 }
 
 .side-menu__form-wrapper {
   @apply hidden md:flex justify-between items-center h-full gap-2;
+}
+
+.side-menu.active .side-menu__form-wrapper {
+  @apply flex md:w-full;
 }
 
 .side-menu__form-search {
@@ -29,7 +45,7 @@
 }
 
 .side-menu__form-btn {
-  @apply flex justify-center items-center shadow-inner bg-indigo-600 text-white rounded-full w-8 h-8;
+  @apply flex justify-center items-center shadow-inner bg-primary text-white rounded-full w-8 h-8;
   min-width: 2rem;
 }
 
@@ -39,5 +55,5 @@
 }
 
 .side-menu__item {
-  @apply border-b border-gray-800;
+  @apply border-b border-gray-dark;
 }

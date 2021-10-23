@@ -30,16 +30,16 @@
 }
 
 .chat-message__content {
-  @apply px-4 py-2 bg-white text-gray-900 rounded-xl shadow;
+  @apply px-4 py-2 bg-white text-gray-dark rounded-lg shadow;
   border-start-start-radius: 0;
 }
 
 .chat-message.__self .chat-message__content {
-  @apply bg-indigo-600 text-white;
+  @apply bg-primary text-white;
   border-start-end-radius: 0;
   border-start-start-radius: 0.75rem;
 }
 
 .chat-message__date {
-  @apply text-xs text-gray-400 self-end;
+  @apply text-xs text-gray opacity-50 self-end;
 }

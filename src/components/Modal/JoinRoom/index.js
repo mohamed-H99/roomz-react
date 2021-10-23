@@ -3,60 +3,65 @@ import { StateContext, joinRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
+const initialState = {
+  loading: false,
+  id: "",
+};
+
 export default function JoinRoomModal({ onDiscard }) {
-  const [state, setState] = useState({
-    loading: false,
-    name: "",
-  });
+  const [state, setState] = useState(initialState);
 
   const { currentUser } = useContext(StateContext);
 
   const handleJoin = async (e) => {
     e.preventDefault();
-    if (state.name.trim()) {
+    if (state.id.trim()) {
       setState((prev) => ({ ...prev, loading: true }));
       await joinRoom({
-        id: state.name.trim(),
+        id: state.id.trim(),
         uid: currentUser?.uid,
         uname: currentUser?.displayName,
       });
-      setState((prev) => ({ name: "", loading: false }));
+      setState(initialState);
     }
   };
 
   const handleDiscard = (e) => {
     e.preventDefault();
-    onDiscard(e);
+    onDiscard();
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, [name]: value }));
+    setState((prev) => ({ ...prev, id: value }));
   };
 
   return (
-    <div className="join-room-modal">
-      <div className="join-room-modal__wrapper">
-        <form className="join-room-modal__form">
-          <h2 className="join-room-modal__form-title">{"Join Room"}</h2>
-          <p className="join-room-modal__form-subtitle">
-            {"You can search by room ID."}
+    <div className="modal">
+      <div className="modal-wrapper">
+        <div className="modal-header">
+          <h2 className="modal-header__title">{"Join Room"}</h2>
+          <p className="modal-header__subtitle">
+            {"You can search by room-ID."}
           </p>
+        </div>
 
-          <div className="join-room-modal__form-group">
-            <label className="join-room-modal__form-label">{"Room-ID"}</label>
+        <div className="modal-body">
+          <div className="form-group">
+            <label className="form-label">{"Room id"}</label>
             <input
               name="name"
-              className="join-room-modal__form-control"
+              className="form-control"
               type="text"
               placeholder=""
               value={state[`name`]}
               onChange={handleChange}
             />
           </div>
+        </div>
 
-          <div className="join-room-modal__form-actions">
+        <div className="modal-footer">
+          <div className="modal-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
@@ -68,7 +73,7 @@ export default function JoinRoomModal({ onDiscard }) {
               {"Discard"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

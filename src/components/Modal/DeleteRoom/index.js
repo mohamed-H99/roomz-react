@@ -24,14 +24,19 @@ export default function DeleteRoomModal({ onDiscard }) {
   };
 
   return (
-    <div className="delete-room-modal">
-      <div className="delete-room-modal__wrapper">
-        <form className="delete-room-modal__form">
-          <h2 className="delete-room-modal__form-title">
-            {`Are you sure you want to delete ${activeRoom?.name}?`}
+    <div className="modal">
+      <div className="modal-wrapper">
+        <div clas="modal-header">
+          <h2 className="modal-header__title">
+            {`Are you sure you want to delete: `}
+            <span className="text-danger">{`${activeRoom?.name || ""}`}</span>
           </h2>
+        </div>
 
-          <div className="delete-room-modal__form-actions">
+        <div className="modal-body"></div>
+
+        <div className="modal-footer">
+          <div className="modal-footer__actions">
             <Button variant="danger" loading={loading} onClick={handleDelete}>
               {"Delete"}
             </Button>
@@ -39,7 +44,7 @@ export default function DeleteRoomModal({ onDiscard }) {
               {"Discard"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

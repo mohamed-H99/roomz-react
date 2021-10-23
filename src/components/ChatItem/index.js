@@ -2,11 +2,12 @@ import React, { useContext } from "react";
 import { ACTIONS, DispatchContext } from "../../appContext";
 import "./style.css";
 
-export default function ChatItem({ data }) {
+export default function ChatItem({ data, onSelect }) {
   const dispatch = useContext(DispatchContext);
 
   const activateRoom = (e) => {
     e.stopPropagation();
+    onSelect();
     dispatch({ type: ACTIONS.update_active_room, payload: data });
   };
 

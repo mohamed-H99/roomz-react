@@ -1,15 +1,24 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StateContext, editRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
+const initialState = {
+  loading: false,
+  name: "",
+};
+
 export default function EditRoomModal({ onDiscard }) {
   const { activeRoom } = useContext(StateContext);
 
-  const [state, setState] = useState({
-    loading: false,
-    name: activeRoom?.name,
-  });
+  const [state, setState] = useState(initialState);
+
+  useEffect(() => {
+    setState((prev) => ({ ...prev, name: activeRoom?.name }));
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleEdit = async (e) => {
     e.preventDefault();
@@ -18,43 +27,44 @@ export default function EditRoomModal({ onDiscard }) {
       name: state.name,
       id: activeRoom?.id,
     });
-    setState({ name: activeRoom?.name, loading: false });
-    onDiscard(e);
+    setState(initialState);
+    onDiscard();
   };
 
   const handleDiscard = (e) => {
     e.preventDefault();
-    onDiscard(e);
+    onDiscard();
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, [name]: value }));
+    setState((prev) => ({ ...prev, name: value }));
   };
 
   return (
-    <div className="edit-room-modal">
-      <div className="edit-room-modal__wrapper">
-        <form className="edit-room-modal__form">
-          <h2 className="edit-room-modal__form-title">{"Edit Room"}</h2>
-          <p className="edit-room-modal__form-subtitle">
-            {"Edit your room info."}
-          </p>
+    <div className="modal">
+      <div className="modal-wrapper">
+        <div className="modal-header">
+          <h2 className="modal-header__title">{"Edit Room"}</h2>
+          <p className="modal-header__subtitle">{"Edit your room info."}</p>
+        </div>
 
-          <div className="edit-room-modal__form-group">
-            <label className="edit-room-modal__form-label">{"New name"}</label>
+        <div className="modal-body">
+          <div className="form-group">
+            <label className="form-label">{"New name"}</label>
             <input
               name="name"
-              className="edit-room-modal__form-control"
+              className="form-control"
               type="text"
-              placeholder="Name.."
-              value={state[`name`]}
+              placeholder=""
+              value={state.name}
               onChange={handleChange}
             />
           </div>
+        </div>
 
-          <div className="edit-room-modal__form-actions">
+        <div className="modal-footer">
+          <div className="modal-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
@@ -66,7 +76,7 @@ export default function EditRoomModal({ onDiscard }) {
               {"Discard"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

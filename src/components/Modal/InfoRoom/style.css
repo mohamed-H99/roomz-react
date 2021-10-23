@@ -9,11 +9,11 @@
 }
 
 .info-room-modal__content-title {
-  @apply text-3xl text-gray-700;
+  @apply text-3xl text-gray-dark;
 }
 
 .info-room-modal__content-subtitle {
-  @apply text-gray-400 text-sm mt-2 mb-8;
+  @apply text-gray-light text-sm mt-2 mb-8;
 }
 
 .info-room-modal__content-group {
@@ -21,18 +21,18 @@
 }
 
 .info-room-modal__content-label {
-  @apply text-gray-700;
+  @apply text-gray-dark;
 }
 
 .info-room-modal__content-group.optional
   .info-room-modal__content-label::after {
   content: "*optional";
-  @apply text-gray-400 ms-1 inline-block text-xs;
+  @apply text-gray-light ms-1 inline-block text-xs;
   vertical-align: text-top;
 }
 
 .info-room-modal__content-control {
-  @apply p-4 shadow rounded-xl outline-none w-full;
+  @apply p-4 shadow rounded-lg outline-none w-full;
 }
 
 .info-room-modal__content-actions {

@@ -20,10 +20,7 @@ function App() {
   const dispatch = useContext(DispatchContext);
   const modalType = useLocation().search.slice(1);
 
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    dispatch({ type: ACTIONS.close_modal });
-  };
+  const handleDiscard = () => dispatch({ type: ACTIONS.close_modal });
 
   return (
     <>

@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ChatItem from "../ChatItem";
-import { Search, Plus, Users } from "react-feather";
+import { Search, Plus, Users, Menu } from "react-feather";
 import "./style.css";
 import { ACTIONS, DispatchContext, StateContext } from "../../appContext";
 import { useHistory } from "react-router";
@@ -43,8 +43,21 @@ export default function SideMenu() {
     dispatch({ type: ACTIONS.open_modal });
   };
 
+  const sideMenuRef = useRef(null);
+
+  const toggleSideMenu = (e) => {
+    e?.preventDefault();
+    const sideMenu = sideMenuRef.current;
+    if (sideMenu) {
+      sideMenu.classList.toggle("active");
+    }
+  };
+
   return (
-    <aside className="side-menu">
+    <aside className="side-menu" ref={sideMenuRef}>
+      <button className="side-menu__toggle" onClick={toggleSideMenu}>
+        <Menu />
+      </button>
       <div className="side-menu__wrapper">
         <form className="side-menu__form">
           <div className="side-menu__form-wrapper">
@@ -57,18 +70,20 @@ export default function SideMenu() {
                 onChange={handleChange}
               />
             </div>
-            <button
-              className="side-menu__form-btn"
-              onClick={(e) => openModal(e, "create_room")}
-            >
-              <Plus />
-            </button>
-            <button
-              className="side-menu__form-btn"
-              onClick={(e) => openModal(e, "join_room")}
-            >
-              <Users />
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="side-menu__form-btn"
+                onClick={(e) => openModal(e, "create_room")}
+              >
+                <Plus />
+              </button>
+              <button
+                className="side-menu__form-btn"
+                onClick={(e) => openModal(e, "join_room")}
+              >
+                <Users />
+              </button>
+            </div>
           </div>
         </form>
 
@@ -76,7 +91,7 @@ export default function SideMenu() {
           {state.rooms.length
             ? state.rooms.map((room) => (
                 <li className="side-menu__item" key={room.id}>
-                  <ChatItem data={room} />
+                  <ChatItem data={room} onSelect={toggleSideMenu} />
                 </li>
               ))
             : ""}

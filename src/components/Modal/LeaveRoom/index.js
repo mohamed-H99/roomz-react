@@ -3,60 +3,66 @@ import { StateContext, leaveRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
+const initialState = {
+  loading: false,
+  formData: {
+    reason: "",
+  },
+};
+
 export default function LeaveRoomModal({ onDiscard }) {
   const { currentUser, activeRoom } = useContext(StateContext);
-
-  const [state, setState] = useState({
-    loading: false,
-    name: "",
-  });
+  const [state, setState] = useState(initialState);
 
   const handleLeave = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
     await leaveRoom({
       id: activeRoom?.id,
-      reason: state.name,
+      reason: state.reason,
       uid: currentUser?.uid,
     });
-    setState({ name: "", loading: false });
-    onDiscard(e);
+    setState(initialState);
+    onDiscard();
   };
 
   const handleDiscard = (e) => {
     e.preventDefault();
-    onDiscard(e);
+    onDiscard();
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, [name]: value }));
+    setState((prev) => ({ ...prev, reason: value }));
   };
 
   return (
-    <div className="leave-room-modal">
-      <div className="leave-room-modal__wrapper">
-        <form className="leave-room-modal__form">
-          <h2 className="leave-room-modal__form-title">
-            {`Are you sure you want to leave '${activeRoom?.name}'?`}
+    <div className="modal">
+      <div className="modal-wrapper">
+        {/* modal header */}
+        <div className="modal-header">
+          <h2 className="modal-header__title">
+            {`Are you sure you want to leave: `}
+            <span className="text-danger">{`${activeRoom?.name || ""}`}</span>
           </h2>
+        </div>
 
-          <div className="leave-room-modal__form-group optional">
-            <label className="leave-room-modal__form-label">
-              {"Why are you leaving?"}
-            </label>
+        <div className="modal-body">
+          <div className="form-group optional">
+            <label className="form-label">{"Why are you leaving?"}</label>
             <input
               name="name"
-              className="leave-room-modal__form-control"
+              className="form-control"
               type="text"
-              placeholder="Name.."
-              value={state[`name`]}
+              placeholder=""
+              value={state.formData.reason}
               onChange={handleChange}
             />
           </div>
+        </div>
 
-          <div className="leave-room-modal__form-actions">
+        <div className="modal-footer">
+          <div className="modal-footer__actions">
             <Button
               variant="danger"
               loading={state.loading}
@@ -68,7 +74,7 @@ export default function LeaveRoomModal({ onDiscard }) {
               {"Discard"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

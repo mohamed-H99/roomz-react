@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply flex justify-center items-center py-2 px-4 bg-transparent font-semibold tracking-wide text-sm rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-transparent;
+  }
+  .btn.btn-primary {
+    @apply bg-primary-lightest text-primary-dark focus:ring-primary;
+  }
+  .btn.btn-light {
+    @apply bg-gray-lightest text-gray-dark focus:ring-0;
+  }
+  .btn.btn-dark {
+    @apply bg-gray-darkest text-white focus:ring-0;
+  }
+  .btn.btn-danger {
+    @apply bg-danger-lightest text-danger focus:ring-danger;
+  }
+  .btn.btn-warning {
+    @apply bg-warning-lightest text-warning focus:ring-warning;
+  }
+  .btn.btn-success {
+    @apply bg-success-lightest text-success focus:ring-success;
+  }
+}

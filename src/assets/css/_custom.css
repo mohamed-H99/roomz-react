@@ -1,8 +1,5 @@
-:root {
-}
-
 body {
-  @apply overflow-hidden bg-gray-100;
+  @apply overflow-hidden w-screen h-screen bg-gray-lightest text-gray-darkest;
 }
 
 .ReactModal__Overlay {
@@ -16,7 +13,55 @@ body {
   border: 0 !important;
   border-radius: 0.75rem !important;
   transform: translate(-50%, -50%);
-  @apply shadow-xl;
-  width: 90%;
-  max-width: fit-content;
+  @apply shadow-lg border border-gray-light w-11/12 max-w-xl;
+}
+
+/*  */
+/* form styles */
+.form-group {
+  @apply flex flex-col gap-1 justify-center items-start w-full;
+}
+.form-label {
+  @apply text-gray-dark;
+}
+.form-group.optional .form-label::after {
+  content: "*optional";
+  vertical-align: text-top;
+  @apply inline-block text-gray text-xs ms-1;
+}
+.form-control {
+  @apply py-3 px-4 block w-full rounded-lg shadow bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors focus:ring-2 focus:ring-gray;
+}
+
+/* ================== */
+/* inner modal styles */
+
+.modal {
+}
+
+.modal-wrapper {
+  @apply px-3 py-1;
+}
+
+.modal-header {
+  @apply flex flex flex-col gap-1;
+}
+
+.modal-header__title {
+  @apply text-3xl;
+}
+
+.modal-header__subtitle {
+  @apply text-gray text-sm tracking-wide;
+}
+
+.modal-body {
+  @apply py-6;
+}
+
+.modal-footer {
+}
+
+.modal-footer__actions {
+  @apply flex gap-2;
 }
