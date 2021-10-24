@@ -28,7 +28,7 @@ export default function ChatContent() {
           <ChatMessage
             key={idx}
             data={msg}
-            self={currentUser?.uid === msg.author_id ? true : false}
+            self={currentUser?.uid === msg.uid ? true : false}
           />
         ))}
       </div>

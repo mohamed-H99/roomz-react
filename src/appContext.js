@@ -1,9 +1,10 @@
 import { createContext, useReducer, useEffect } from "react";
 import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import {
   collection,
@@ -39,6 +40,8 @@ export const ACTIONS = {
   info_active_room: "info_active_room",
   leave_active_room: "leave_room",
   delete_active_room: "delete_active_room",
+  login: "login",
+  signup: "signup",
   logout: "logout",
 };
 
@@ -92,6 +95,9 @@ const initialState = {
     member_not_found: "Member is not found",
     room_exists: "Room is already exists",
     room_not_found: "Room is not found",
+    auth_wrong: "Wrong email or password",
+    auth_not_found: "User is not found",
+    weak_password: "Weak password, Try something longer",
   },
 };
 
@@ -112,7 +118,7 @@ export default function AppContextProvider({ children }) {
         let client_is_admin = false;
         if (membersLen) {
           for (let i = 0; i < membersLen; i++) {
-            if (members[i].id === client_id && members[i].is_admin) {
+            if (members[i].uid === client_id && members[i].is_admin) {
               client_is_admin = true;
               break;
             }
@@ -145,7 +151,7 @@ export default function AppContextProvider({ children }) {
 
   const fetchMainData = () => {
     getAuth().onAuthStateChanged((cred) => {
-      fetchRooms(cred?.uid);
+      if (cred?.uid) fetchRooms(cred.uid);
       dispatch({ type: ACTIONS.update_current_user, payload: cred });
     });
   };
@@ -211,7 +217,7 @@ function reducer(state, { type, payload }) {
 }
 
 // ===============
-// basic functions
+// msg functions
 
 export const errorMsg = (msg) => ({ type: "error", message: msg });
 
@@ -220,10 +226,22 @@ export const successMsg = (msg) => ({ type: "success", message: msg });
 // ================
 // functions (auth)
 
-export const loginWithGoogle = () =>
-  signInWithPopup(getAuth(), new GoogleAuthProvider());
+export const loginWithEmailAndPassword = ({ email, password }) =>
+  signInWithEmailAndPassword(getAuth(), email, password);
 
-export const logout = () => signOut();
+export const signUpWithEmailAndPassword = ({ email, password }) =>
+  createUserWithEmailAndPassword(getAuth(), email, password);
+
+export const updateNewUserProfile = ({ uname }) =>
+  updateProfile(getAuth(), {
+    displayName: uname,
+    photoURL: "",
+  });
+
+export const logout = () => signOut(getAuth());
+
+// export const loginWithGoogle = () =>
+//   signInWithPopup(getAuth(), new GoogleAuthProvider());
 
 // =====================
 // functions (firestore)
@@ -270,10 +288,10 @@ export const addMemberToRoom = async ({ id: room_id, uid, uname }) => {
     const oldMembersId = roomDocData.members_id;
 
     const member =
-      oldMembers.findIndex((m) => m.id === uid) === -1 ? false : true;
+      oldMembers.findIndex((m) => m.uid === uid) === -1 ? false : true;
     if (!member) {
       return updateDoc(roomDocRef, {
-        members: [...oldMembers, { uid: uid, uname: uname, is_admin: false }],
+        members: [...oldMembers, { uid, uname, is_admin: false }],
         members_id: [...oldMembersId, uid],
       });
     } else return errorMsg(initialState.errorMessages.member_exists);

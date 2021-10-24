@@ -1,16 +1,7 @@
 .auth-form {
-  @apply absolute top-1/2 left-1/2;
-  transform: translate(-50%, -50%);
+  @apply w-screen max-w-full h-screen flex justify-center items-center;
 }
 
 .auth-form__wrapper {
-  @apply p-8 rounded-lg shadow-lg bg-white flex flex-col gap-4 justify-center items-center;
-}
-
-.auth-form__title {
-  @apply text-primary text-4xl text-center mb-4;
-}
-
-.auth-form__btn {
-  @apply text-primary border-2 border-primary transition-colors bg-transparent py-2 px-4 rounded-lg shadow hover:bg-primary hover:text-white;
+  @apply bg-white max-w-full p-4 shadow-xl px-6 py-4 rounded-lg;
 }

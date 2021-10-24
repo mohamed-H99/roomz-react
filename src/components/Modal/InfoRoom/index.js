@@ -19,7 +19,7 @@ export default function InfoRoomModal({ onDiscard }) {
     <div className="modal">
       <div className="modal-wrapper">
         <div className="modal-header">
-          <h2 className="text-2xl">{`${activeRoom?.name} info`}</h2>
+          <h2 className="text-2xl">{`${activeRoom?.name}`}</h2>
         </div>
 
         <div className="modal-body text-gray">
@@ -40,6 +40,7 @@ export default function InfoRoomModal({ onDiscard }) {
               onClick={copyId}
               disabled={false}
               value={`${activeRoom?.id}`}
+              readOnly={true}
             />
           </div>
         </div>

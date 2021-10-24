@@ -55,7 +55,7 @@ export default function SideMenu() {
   };
 
   return (
-    <aside className="side-menu" ref={sideMenuRef}>
+    <aside className="side-menu active" ref={sideMenuRef}>
       <button className="side-menu__toggle" onClick={toggleSideMenu}>
         <Menu />
       </button>

@@ -1,10 +1,7 @@
 import { useContext } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 import Chat from "./pages/Chat";
-import Auth from "./pages/Auth";
 import Error from "./pages/Error";
-import PrivateRoute from "./privateRoute";
-import "./assets/css/style.css";
 import ReactModal from "react-modal";
 import { ACTIONS, DispatchContext, StateContext } from "./appContext";
 import CreateRoomModal from "./components/Modal/CreateRoom";
@@ -16,6 +13,8 @@ import DeleteRoomModal from "./components/Modal/DeleteRoom";
 import { ToastContainer } from "react-toastify";
 import AddMemberRoomModal from "./components/Modal/AddMemberRoom";
 import LogoutModal from "./components/Modal/Logout";
+import "react-toastify/dist/ReactToastify.css";
+import "./assets/css/style.css";
 
 function App() {
   const state = useContext(StateContext);
@@ -27,8 +26,7 @@ function App() {
   return (
     <>
       <Switch>
-        <PrivateRoute path="/" exact component={Chat} />
-        <Route path="/auth" component={Auth} />
+        <Route path="/" exact component={Chat} />
         <Route path="/404" exact component={Error} />
         <Redirect to="/404" />
       </Switch>

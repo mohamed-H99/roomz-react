@@ -17,8 +17,8 @@ export default function ChatForm() {
     if (msgInput)
       sendMessageToRoom(activeRoom?.messages, {
         id: activeRoom?.id,
-        author_id: currentUser?.uid,
-        author_name: currentUser?.displayName, // [providerNaming]
+        uid: currentUser?.uid,
+        uname: currentUser?.displayName || "", // [providerNaming]
         content: msgInput.trim(),
       });
     dispatch({ type: ACTIONS.update_msg_input, payload: "" });

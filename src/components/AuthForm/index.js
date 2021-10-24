@@ -1,33 +1,25 @@
-import React from "react";
-import { useHistory } from "react-router";
-import { addUser, loginWithGoogle } from "../../appContext";
+import React, { useState } from "react";
+import { ACTIONS } from "../../appContext";
+import LoginForm from "../LoginForm";
+import SignupForm from "../SignupForm";
 import "./style.css";
 
 export default function AuthForm() {
-  const history = useHistory();
+  const [activeForm, setActiveForm] = useState(ACTIONS.login);
 
-  const HandleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await loginWithGoogle();
-    if (res) {
-      addUser({
-        uid: res.user.uid,
-        uname: res.user.displayName,
-      });
-      history.push("/");
-    }
+  const switchForm = () => {
+    if (activeForm === ACTIONS.login) setActiveForm(ACTIONS.signup);
+    else setActiveForm(ACTIONS.login);
   };
-
   return (
-    <form className="auth-form" onSubmit={HandleSubmit}>
+    <div className="auth-form">
       <div className="auth-form__wrapper">
-        <h1 className="auth-form__title">
-          {"Join our Awesome community members"}
-        </h1>
-        <button className="auth-form__btn">
-          {"Login with"} <strong>{"Google"}</strong>
-        </button>
+        {activeForm === ACTIONS.login ? (
+          <LoginForm onSwitch={switchForm} />
+        ) : (
+          <SignupForm onSwitch={switchForm} />
+        )}
       </div>
-    </form>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 .chat-header {
   @apply w-full h-16 py-0 px-4 bg-white shadow absolute top-0 left-0;
+  z-index: 1;
 }
 
 .chat-header__wrapper {

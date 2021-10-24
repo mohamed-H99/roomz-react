@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { toast } from "react-toastify";
 import { StateContext, addMemberToRoom } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
@@ -14,20 +15,26 @@ export default function JoinRoomModal({ onDiscard }) {
   const { currentUser } = useContext(StateContext);
 
   const handleJoin = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (state.id.trim()) {
       setState((prev) => ({ ...prev, loading: true }));
       await addMemberToRoom({
         id: state.id.trim(),
         uid: currentUser?.uid,
         uname: currentUser?.displayName,
-      });
+      })
+        .then(() => {
+          handleDiscard();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
       setState(initialState);
     }
   };
 
   const handleDiscard = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     onDiscard();
   };
 
