@@ -18,10 +18,8 @@ import {
   query,
   orderBy,
   where,
-  WhereFilterOp,
 } from "firebase/firestore";
 import { produce } from "immer";
-import { toast } from "react-toastify";
 
 export const StateContext = createContext();
 export const DispatchContext = createContext();
@@ -37,9 +35,11 @@ export const ACTIONS = {
   create_room: "create_room",
   join_room: "join_room",
   edit_active_room: "edit_active_room",
+  add_member_to_active_room: "add_member_to_active_room",
   info_active_room: "info_active_room",
   leave_active_room: "leave_room",
   delete_active_room: "delete_active_room",
+  logout: "logout",
 };
 
 const initialState = {
@@ -48,6 +48,23 @@ const initialState = {
   currentUser: null,
   rooms: [],
   activeRoom: null,
+  menuOptions: [
+    {
+      title: "Create room",
+      action: ACTIONS.create_room,
+      admin_access: false,
+    },
+    {
+      title: "Join room",
+      action: ACTIONS.join_room,
+      admin_access: false,
+    },
+    {
+      title: "Logout",
+      action: ACTIONS.logout,
+      admin_access: false,
+    },
+  ],
   roomOptions: [
     {
       title: "Edit",
@@ -55,9 +72,9 @@ const initialState = {
       admin_access: true,
     },
     {
-      title: "Info",
-      action: ACTIONS.info_active_room,
-      admin_access: false,
+      title: "Add new member",
+      action: ACTIONS.add_member_to_active_room,
+      admin_access: true,
     },
     {
       title: "Leave",
@@ -152,40 +169,40 @@ function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.open_modal:
       return produce(state, (draftState) => {
-        draftState[`modalIsOpen`] = true;
+        draftState["modalIsOpen"] = true;
       });
 
     case ACTIONS.close_modal:
       return produce(state, (draftState) => {
-        draftState[`modalIsOpen`] = false;
+        draftState["modalIsOpen"] = false;
       });
 
     case ACTIONS.update_current_user:
       return produce(state, (draftState) => {
-        draftState[`currentUser`] = payload;
+        draftState["currentUser"] = payload;
       });
 
     case ACTIONS.update_msg_input:
       return produce(state, (draftState) => {
-        draftState[`msgInput`] = payload;
+        draftState["msgInput"] = payload;
       });
 
     case ACTIONS.update_rooms:
       return produce(state, (draftState) => {
-        draftState[`rooms`] = payload;
+        draftState["rooms"] = payload;
         if (state.activeRoom && payload.length) {
           const updatedDoc = payload.find(
             (doc) => doc.id === state.activeRoom.id
           );
-          draftState[`activeRoom`] = updatedDoc;
+          draftState["activeRoom"] = updatedDoc;
         } else {
-          draftState[`activeRoom`] = null;
+          draftState["activeRoom"] = null;
         }
       });
 
     case ACTIONS.update_active_room:
       return produce(state, (draftState) => {
-        draftState[`activeRoom`] = payload;
+        draftState["activeRoom"] = payload;
       });
 
     default:
@@ -211,39 +228,29 @@ export const logout = () => signOut();
 // =====================
 // functions (firestore)
 
-export const createRoom = (data) => {
-  return setDoc(doc(collection(getFirestore(), "rooms")), {
-    name: data.name,
+export const addUser = ({ uid, uname }) => {
+  const usersRef = collection(getFirestore(), "users");
+  return setDoc(doc(usersRef, uid), {
+    uid,
+    uname,
+  });
+};
+
+export const createRoom = ({ uid, uname, name }) => {
+  const roomsRef = collection(getFirestore(), "rooms");
+  return setDoc(doc(roomsRef), {
+    name: name,
     messages: [],
-    members_id: [data.uid],
-    // admins_id: [data.uid],
+    members_id: [uid],
     members: [
       {
-        id: data.uid,
-        name: data.uname,
+        uid: uid,
+        uname: uname,
         is_admin: true,
       },
     ],
     created_at: Timestamp.fromDate(new Date()),
   });
-};
-
-export const joinRoom = async ({ id, uid, uname }) => {
-  const roomDocRef = doc(getFirestore(), "rooms", id);
-  const roomDocData = (await getDoc(roomDocRef)).data();
-  if (roomDocData) {
-    const oldMembers = roomDocData.members;
-    const oldMembersId = roomDocData.members_id;
-
-    const member =
-      oldMembers.findIndex((m) => m.id === uid) === -1 ? false : true;
-    if (!member) {
-      return updateDoc(roomDocRef, {
-        members: [...oldMembers, { id: uid, name: uname, is_admin: false }],
-        members_id: [...oldMembersId, uid],
-      });
-    } else return errorMsg(initialState.errorMessages.member_exists);
-  } else return errorMsg(initialState.errorMessages.room_not_found);
 };
 
 export const editRoom = ({ id, name }) => {
@@ -253,17 +260,37 @@ export const editRoom = ({ id, name }) => {
   });
 };
 
+export const addMemberToRoom = async ({ id: room_id, uid, uname }) => {
+  const roomDocRef = doc(getFirestore(), "rooms", room_id);
+  const roomDocData = (await getDoc(roomDocRef)).data();
+  const userRef = doc(getFirestore(), "users", uid);
+
+  if (roomDocData && userRef) {
+    const oldMembers = roomDocData.members;
+    const oldMembersId = roomDocData.members_id;
+
+    const member =
+      oldMembers.findIndex((m) => m.id === uid) === -1 ? false : true;
+    if (!member) {
+      return updateDoc(roomDocRef, {
+        members: [...oldMembers, { uid: uid, uname: uname, is_admin: false }],
+        members_id: [...oldMembersId, uid],
+      });
+    } else return errorMsg(initialState.errorMessages.member_exists);
+  } else return errorMsg(initialState.errorMessages.room_not_found);
+};
+
 export const leaveRoom = async ({ id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
   const roomDocData = (await getDoc(roomDocRef)).data();
   if (roomDocData) {
     const oldMembers = roomDocData.members;
     const oldMembersId = roomDocData.members_id;
-    const member = oldMembers.find((m) => m.id === uid);
+    const member = oldMembers.find((m) => m.uid === uid);
     if (member) {
       // && memberId
-      const newMembers = oldMembers.filter((m) => m.id !== member.id);
-      const newMembersId = oldMembersId.filter((m_id) => m_id !== member.id);
+      const newMembers = oldMembers.filter((m) => m.uid !== member.uid);
+      const newMembersId = oldMembersId.filter((m_id) => m_id !== member.uid);
       return updateDoc(roomDocRef, {
         members: [...newMembers],
         members_id: [...newMembersId],
@@ -277,17 +304,14 @@ export const deleteRoom = ({ id }) => {
   return deleteDoc(roomDocRef);
 };
 
-export const sendMessageToRoom = (
-  oldMessages,
-  { id, author_id, author_name, content }
-) => {
+export const sendMessageToRoom = (oldMessages, { id, uid, uname, content }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
   return updateDoc(roomDocRef, {
     messages: [
       ...oldMessages,
       {
-        author_id,
-        author_name,
+        uid,
+        uname,
         content,
         created_at: Timestamp.fromDate(new Date()),
       },

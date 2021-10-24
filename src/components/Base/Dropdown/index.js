@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Settings } from "react-feather";
+import Button from "../Button";
 import { useHistory } from "react-router";
 import { ACTIONS, DispatchContext, StateContext } from "../../../appContext";
 
@@ -8,14 +8,14 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Dropdown({ links }) {
+export default function Dropdown({ links, variant, children }) {
   const dispatch = useContext(DispatchContext);
   const { activeRoom } = useContext(StateContext);
   const [accessibleLinks, setAccessibleLinks] = useState([]);
   const history = useHistory();
 
   const getAccessLinks = () => {
-    if (!activeRoom.client_is_admin && links?.length) {
+    if (!activeRoom?.client_is_admin && links?.length) {
       const newLinks = links.filter((link) => !link.admin_access);
       setAccessibleLinks(newLinks);
     } else {
@@ -39,8 +39,10 @@ export default function Dropdown({ links }) {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <Menu.Button className="btn shadow-none p-2 text-xs rounded-full">
-          <Settings />
+        <Menu.Button
+          className={`btn btn-${variant} bg-white text-gray shadow rounded-full p-0 text-xs h-12 w-12 flex justify-center items-center`}
+        >
+          {children}
         </Menu.Button>
       </div>
 

@@ -14,6 +14,7 @@ import LeaveRoomModal from "./components/Modal/LeaveRoom";
 import InfoRoomModal from "./components/Modal/InfoRoom";
 import DeleteRoomModal from "./components/Modal/DeleteRoom";
 import { ToastContainer } from "react-toastify";
+import AddMemberRoomModal from "./components/Modal/AddMemberRoom";
 
 function App() {
   const state = useContext(StateContext);
@@ -40,6 +41,9 @@ function App() {
         )}
         {modalType === ACTIONS.edit_active_room && (
           <EditRoomModal onDiscard={handleDiscard} />
+        )}
+        {modalType === ACTIONS.add_member_to_active_room && (
+          <AddMemberRoomModal onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.info_active_room && (
           <InfoRoomModal onDiscard={handleDiscard} />

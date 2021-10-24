@@ -30,3 +30,7 @@
 .chat-header__content-subtitle {
   @apply opacity-60 text-xs;
 }
+
+.chat-header__options {
+  @apply flex gap-2 items-center;
+}

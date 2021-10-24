@@ -1,10 +1,21 @@
 import React, { useContext } from "react";
-import { StateContext } from "../../appContext";
+import { ACTIONS, DispatchContext, StateContext } from "../../appContext";
 import Dropdown from "../Base/Dropdown";
+import { Info, Settings } from "react-feather";
 import "./style.css";
+import Button from "../Base/Button";
+import { useHistory } from "react-router";
 
 export default function ChatHeader() {
-  const { activeRoom, currentUser, roomOptions } = useContext(StateContext);
+  const dispatch = useContext(DispatchContext);
+  const { activeRoom, roomOptions } = useContext(StateContext);
+  const history = useHistory();
+
+  const showInfo = (e) => {
+    e.stopPropagation();
+    dispatch({ type: ACTIONS.open_modal });
+    history.push(`?${ACTIONS.info_active_room}`);
+  };
 
   return (
     <div className="chat-header">
@@ -29,7 +40,16 @@ export default function ChatHeader() {
         </div>
 
         <div className="chat-header__options">
-          <Dropdown links={roomOptions} />
+          <Button
+            variant=""
+            className="bg-white text-gray shadow rounded-full p-0 text-xs h-12 w-12 flex justify-center items-center"
+            onClick={showInfo}
+          >
+            <Info />
+          </Button>
+          <Dropdown variant="" links={roomOptions}>
+            <Settings />
+          </Dropdown>
         </div>
       </div>
     </div>

@@ -6,6 +6,10 @@ import "./style.css";
 export default function InfoRoomModal({ onDiscard }) {
   const { activeRoom } = useContext(StateContext);
 
+  const copyId = () => {
+    navigator.clipboard.writeText(activeRoom?.id);
+  };
+
   const handleDiscard = (e) => {
     e.preventDefault();
     onDiscard();
@@ -19,16 +23,25 @@ export default function InfoRoomModal({ onDiscard }) {
         </div>
 
         <div className="modal-body text-gray">
-          <p className="">
+          <div>
             {`${activeRoom?.members.length} member${
               activeRoom?.members.length > 1 ? "s" : ""
             }`}
-          </p>
-          <p className="">
+          </div>
+          <div>
             {`${activeRoom?.messages.length} message${
               activeRoom?.messages.length > 1 ? "s" : ""
             }`}
-          </p>
+          </div>
+          <div className="form-group">
+            <label className="form-label">{`Room ID`}</label>
+            <input
+              className="btn btn-primary"
+              onClick={copyId}
+              disabled={false}
+              value={`${activeRoom?.id}`}
+            />
+          </div>
         </div>
 
         <div className="modal-footer">

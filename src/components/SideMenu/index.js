@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import Dropdown from "../Base/Dropdown";
 import ChatItem from "../ChatItem";
 import { Search, Plus, Users, Menu } from "react-feather";
 import "./style.css";
@@ -7,7 +8,7 @@ import { useHistory } from "react-router";
 
 export default function SideMenu() {
   const dispatch = useContext(DispatchContext);
-  const { rooms } = useContext(StateContext);
+  const { rooms, menuOptions } = useContext(StateContext);
   const [state, setState] = useState({
     search: "",
     rooms: [],
@@ -70,20 +71,9 @@ export default function SideMenu() {
                 onChange={handleChange}
               />
             </div>
-            <div className="flex gap-2">
-              <button
-                className="side-menu__form-btn"
-                onClick={(e) => openModal(e, "create_room")}
-              >
-                <Plus />
-              </button>
-              <button
-                className="side-menu__form-btn"
-                onClick={(e) => openModal(e, "join_room")}
-              >
-                <Users />
-              </button>
-            </div>
+            <Dropdown variant="" links={menuOptions}>
+              <Users />
+            </Dropdown>
           </div>
         </form>
 

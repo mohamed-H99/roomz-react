@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { loginWithGoogle } from "../../appContext";
+import { addUser, loginWithGoogle } from "../../appContext";
 import "./style.css";
 
 export default function AuthForm() {
@@ -8,8 +8,14 @@ export default function AuthForm() {
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
-    await loginWithGoogle();
-    history.push("/");
+    const res = await loginWithGoogle();
+    if (res) {
+      addUser({
+        uid: res.user.uid,
+        uname: res.user.displayName,
+      });
+      history.push("/");
+    }
   };
 
   return (
