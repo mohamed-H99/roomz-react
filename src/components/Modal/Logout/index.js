@@ -1,11 +1,9 @@
-import { useContext, useState } from "react";
-import { StateContext, logout } from "../../../appContext";
+import { useState } from "react";
+import { logout } from "../../../appContext";
 import Button from "../../Base/Button";
 import "./style.css";
 
 export default function LogoutModal({ onDiscard }) {
-  const { activeRoom } = useContext(StateContext);
-
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async (e) => {
@@ -35,10 +33,10 @@ export default function LogoutModal({ onDiscard }) {
         <div className="modal-footer">
           <div className="modal-footer__actions">
             <Button variant="danger" loading={loading} onClick={handleLogout}>
-              {"Logout"}
+              {"Yes, Logout"}
             </Button>
             <Button variant="light" onClick={handleDiscard}>
-              {"Stay"}
+              {"No, Stay"}
             </Button>
           </div>
         </div>
