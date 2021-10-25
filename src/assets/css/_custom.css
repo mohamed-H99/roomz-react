@@ -16,8 +16,9 @@ body {
   @apply shadow-lg border border-gray-light w-11/12 max-w-xl;
 }
 
-/*  */
+/* =========== */
 /* form styles */
+
 .form-group {
   @apply flex mt-3 flex-col gap-1 justify-center items-start w-full;
 }
@@ -35,36 +36,29 @@ body {
 .form-control {
   @apply py-3 px-4 block w-full rounded-lg shadow bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors ring-2 ring-transparent focus:ring-2 focus:ring-gray;
 }
-
-/* ================== */
-/* inner modal styles */
-
-.modal {
-}
-
-.modal-wrapper {
+.form-wrapper {
   @apply px-3 py-1;
 }
 
-.modal-header {
+.form-header {
   @apply flex flex flex-col gap-1;
 }
 
-.modal-header__title {
+.form-header__title {
   @apply text-3xl;
 }
 
-.modal-header__subtitle {
+.form-header__subtitle {
   @apply text-gray text-sm tracking-wide;
 }
 
-.modal-body {
+.form-body {
   @apply py-6;
 }
 
-.modal-footer {
+.form-footer {
 }
 
-.modal-footer__actions {
+.form-footer__actions {
   @apply flex gap-2;
 }

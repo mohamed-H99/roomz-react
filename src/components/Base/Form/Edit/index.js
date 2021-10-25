@@ -1,17 +1,20 @@
 import { useContext, useEffect, useState } from "react";
-import { StateContext, editRoom } from "../../../appContext";
-import Button from "../../Base/Button";
+import { toast } from "react-toastify";
+import { StateContext, editRoom } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
   loading: false,
-  name: "",
+  formData: {
+    name: "",
+  },
 };
 
-export default function EditRoomModal({ onDiscard }) {
-  const { activeRoom } = useContext(StateContext);
-
+export default function EditForm({ onDiscard }) {
   const [state, setState] = useState(initialState);
+
+  const { activeRoom } = useContext(StateContext);
 
   useEffect(() => {
     setState((prev) => ({ ...prev, name: activeRoom?.name }));
@@ -24,55 +27,61 @@ export default function EditRoomModal({ onDiscard }) {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
     await editRoom({
-      name: state.name,
+      name: state.formData.name,
       id: activeRoom?.id,
-    });
-    setState(initialState);
-    onDiscard();
-  };
-
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    onDiscard();
+    })
+      .then(() => {
+        setState(initialState);
+        onDiscard(e);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      })
+      .finally(() => {
+        setState((prev) => ({ ...prev, loading: false }));
+      });
   };
 
   const handleChange = (e) => {
+    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, name: value }));
+    setState((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
-          <h2 className="modal-header__title">{"Edit Room"}</h2>
-          <p className="modal-header__subtitle">{"Edit your room info."}</p>
+    <div className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">{"Edit Room"}</h2>
+          <p className="form-header__subtitle">{"Edit your room info."}</p>
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <div className="form-group">
             <label className="form-label">{"New name"}</label>
             <input
               name="name"
               className="form-control"
               type="text"
+              required={true}
               placeholder=""
-              value={state.name}
+              value={state.formData["name"]}
               onChange={handleChange}
             />
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
               onClick={handleEdit}
+              type="submit"
             >
               {"Edit"}
             </Button>
-            <Button variant="light" onClick={handleDiscard}>
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>

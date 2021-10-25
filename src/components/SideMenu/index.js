@@ -1,19 +1,16 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Dropdown from "../Base/Dropdown";
 import ChatItem from "../ChatItem";
-import { Search, Plus, Users, Menu } from "react-feather";
+import { Search, Users, Menu } from "react-feather";
 import "./style.css";
-import { ACTIONS, DispatchContext, StateContext } from "../../appContext";
-import { useHistory } from "react-router";
+import { StateContext } from "../../appContext";
 
 export default function SideMenu() {
-  const dispatch = useContext(DispatchContext);
   const { rooms, menuOptions } = useContext(StateContext);
   const [state, setState] = useState({
     search: "",
     rooms: [],
   });
-  const history = useHistory();
 
   const handleChange = (e) =>
     setState((prev) => ({ ...prev, search: e.target.value }));
@@ -37,12 +34,6 @@ export default function SideMenu() {
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.search, rooms]);
-
-  const openModal = (e, type) => {
-    e.preventDefault();
-    history.push(`?${type}`);
-    dispatch({ type: ACTIONS.open_modal });
-  };
 
   const sideMenuRef = useRef(null);
 

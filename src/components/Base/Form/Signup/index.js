@@ -4,8 +4,8 @@ import {
   addUser,
   signUpWithEmailAndPassword,
   updateNewUserProfile,
-} from "../../appContext";
-import Button from "../Base/Button";
+} from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
@@ -40,6 +40,8 @@ export default function SignupForm({ onSwitch }) {
       })
       .catch((err) => {
         toast.error(err.message);
+      })
+      .finally(() => {
         setState((prev) => ({ ...prev, loading: false }));
       });
   };
@@ -125,6 +127,7 @@ export default function SignupForm({ onSwitch }) {
               variant="primary"
               loading={state.loading}
               onClick={handleSignup}
+              type="submit"
             >
               {"Signup"}
             </Button>

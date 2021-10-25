@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
-import { StateContext, addMemberToRoom } from "../../../appContext";
-import Button from "../../Base/Button";
+import { toast } from "react-toastify";
+import { StateContext, addMemberToRoom } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
@@ -10,7 +11,7 @@ const initialState = {
   },
 };
 
-export default function AddMemberRoomModal({ onDiscard }) {
+export default function AddMemberForm({ onDiscard }) {
   const [state, setState] = useState(initialState);
 
   const { activeRoom } = useContext(StateContext);
@@ -18,19 +19,22 @@ export default function AddMemberRoomModal({ onDiscard }) {
   const handleJoin = async (e) => {
     e.preventDefault();
     if (state.formData.id.trim()) {
-      // && state.formData.name
       setState((prev) => ({ ...prev, loading: true }));
       await addMemberToRoom({
         id: activeRoom?.id,
         uid: state.formData.id.trim(),
-      });
-      setState(initialState);
+      })
+        .then(() => {
+          setState(initialState);
+          onDiscard(e);
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        })
+        .finally(() => {
+          setState((prev) => ({ ...prev, loading: false }));
+        });
     }
-  };
-
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    onDiscard();
   };
 
   const handleChange = (e) => {
@@ -46,20 +50,21 @@ export default function AddMemberRoomModal({ onDiscard }) {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
-          <h2 className="modal-header__title">{"Add new member"}</h2>
-          <p className="modal-header__subtitle">{"You can add by User-ID."}</p>
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">{"Add new member"}</h2>
+          <p className="form-header__subtitle">{"You can add by User-ID."}</p>
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <div className="form-group">
             <label className="form-label">{"User id"}</label>
             <input
               name="id"
               className="form-control"
               type="text"
+              required={true}
               placeholder=""
               value={state.formData[`id`]}
               onChange={handleChange}
@@ -67,21 +72,22 @@ export default function AddMemberRoomModal({ onDiscard }) {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
               onClick={handleJoin}
+              type="submit"
             >
               {"Add"}
             </Button>
-            <Button variant="light" onClick={handleDiscard}>
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

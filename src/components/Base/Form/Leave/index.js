@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
-import { StateContext, leaveRoom } from "../../../appContext";
-import Button from "../../Base/Button";
+import { toast } from "react-toastify";
+import { StateContext, leaveRoom } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
@@ -10,25 +11,29 @@ const initialState = {
   },
 };
 
-export default function LeaveRoomModal({ onDiscard }) {
-  const { currentUser, activeRoom } = useContext(StateContext);
+export default function LeaveForm({ onDiscard }) {
   const [state, setState] = useState(initialState);
+
+  const { currentUser, activeRoom } = useContext(StateContext);
 
   const handleLeave = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
     await leaveRoom({
       id: activeRoom?.id,
-      reason: state.reason,
+      reason: state.formData.reason,
       uid: currentUser?.uid,
-    });
-    setState(initialState);
-    onDiscard();
-  };
-
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    onDiscard();
+    })
+      .then(() => {
+        setState(initialState);
+        onDiscard(e);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      })
+      .finally(() => {
+        setState((prev) => ({ ...prev, loading: false }));
+      });
   };
 
   const handleChange = (e) => {
@@ -37,23 +42,23 @@ export default function LeaveRoomModal({ onDiscard }) {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        {/* modal header */}
-        <div className="modal-header">
-          <h2 className="modal-header__title">
-            {`Are you sure you want to leave: `}
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">
+            {`Are you sure you want to leave `}
             <span className="text-danger">{`${activeRoom?.name || ""}`}</span>
           </h2>
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <div className="form-group optional">
             <label className="form-label">{"Why are you leaving?"}</label>
             <input
               name="name"
               className="form-control"
               type="text"
+              required={false}
               placeholder=""
               value={state.formData.reason}
               onChange={handleChange}
@@ -61,21 +66,22 @@ export default function LeaveRoomModal({ onDiscard }) {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="danger"
               loading={state.loading}
               onClick={handleLeave}
+              type="submit"
             >
               {"Leave"}
             </Button>
-            <Button variant="light" onClick={handleDiscard}>
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

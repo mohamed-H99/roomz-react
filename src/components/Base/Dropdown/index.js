@@ -1,6 +1,5 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import Button from "../Button";
 import { useHistory } from "react-router";
 import { ACTIONS, DispatchContext, StateContext } from "../../../appContext";
 

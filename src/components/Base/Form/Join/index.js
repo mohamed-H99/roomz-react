@@ -1,87 +1,90 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { StateContext, addMemberToRoom } from "../../../appContext";
-import Button from "../../Base/Button";
+import { StateContext, addMemberToRoom } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
   loading: false,
-  id: "",
+  formData: {
+    id: "",
+  },
 };
 
-export default function JoinRoomModal({ onDiscard }) {
+export default function JoinForm({ onDiscard }) {
   const [state, setState] = useState(initialState);
 
   const { currentUser } = useContext(StateContext);
 
   const handleJoin = async (e) => {
     e?.preventDefault();
-    if (state.id.trim()) {
+    if (state.formData.id.trim()) {
       setState((prev) => ({ ...prev, loading: true }));
       await addMemberToRoom({
-        id: state.id.trim(),
+        id: state.formData.id.trim(),
         uid: currentUser?.uid,
         uname: currentUser?.displayName,
       })
         .then(() => {
-          handleDiscard();
+          setState(initialState);
+          onDiscard(e);
         })
         .catch((err) => {
           toast.error(err.message);
+        })
+        .finally(() => {
+          setState((prev) => ({ ...prev, loading: false }));
         });
-      setState(initialState);
     }
   };
 
-  const handleDiscard = (e) => {
-    e?.preventDefault();
-    onDiscard();
-  };
-
   const handleChange = (e) => {
+    const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({ ...prev, id: value }));
+    setState((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
-          <h2 className="modal-header__title">{"Join Room"}</h2>
-          <p className="modal-header__subtitle">
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">{"Join Room"}</h2>
+          <p className="form-header__subtitle">
             {"You can search by room-ID."}
           </p>
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <div className="form-group">
             <label className="form-label">{"Room id"}</label>
             <input
-              name="name"
+              name="id"
               className="form-control"
               type="text"
               placeholder=""
-              value={state[`name`]}
+              required={true}
+              value={state.formData["id"]}
               onChange={handleChange}
             />
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
               onClick={handleJoin}
+              type="submit"
             >
               {"Join"}
             </Button>
-            <Button variant="light" onClick={handleDiscard}>
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

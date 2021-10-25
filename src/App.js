@@ -4,15 +4,15 @@ import Chat from "./pages/Chat";
 import Error from "./pages/Error";
 import ReactModal from "react-modal";
 import { ACTIONS, DispatchContext, StateContext } from "./appContext";
-import CreateRoomModal from "./components/Modal/CreateRoom";
-import JoinRoomModal from "./components/Modal/JoinRoom";
-import EditRoomModal from "./components/Modal/EditRoom";
-import LeaveRoomModal from "./components/Modal/LeaveRoom";
-import InfoRoomModal from "./components/Modal/InfoRoom";
-import DeleteRoomModal from "./components/Modal/DeleteRoom";
+import CreateForm from "./components/Base/Form/Create";
+import JoinForm from "./components/Base/Form/Join";
+import EditForm from "./components/Base/Form/Edit";
+import LeaveForm from "./components/Base/Form/Leave";
+import InfoForm from "./components/Base/Form/Info";
+import DeleteForm from "./components/Base/Form/Delete";
 import { ToastContainer } from "react-toastify";
-import AddMemberRoomModal from "./components/Modal/AddMemberRoom";
-import LogoutModal from "./components/Modal/Logout";
+import AddMemberForm from "./components/Base/Form/AddMember";
+import LogoutForm from "./components/Base/Form/Logout";
 import "react-toastify/dist/ReactToastify.css";
 import "./assets/css/style.css";
 
@@ -21,7 +21,10 @@ function App() {
   const dispatch = useContext(DispatchContext);
   const modalType = useLocation().search.slice(1);
 
-  const handleDiscard = () => dispatch({ type: ACTIONS.close_modal });
+  const handleDiscard = (e) => {
+    e?.preventDefault();
+    dispatch({ type: ACTIONS.close_modal });
+  };
 
   return (
     <>
@@ -31,33 +34,35 @@ function App() {
         <Redirect to="/404" />
       </Switch>
 
+      {/* modal */}
       <ReactModal isOpen={state.modalIsOpen} ariaHideApp={false}>
         {modalType === ACTIONS.create_room && (
-          <CreateRoomModal onDiscard={handleDiscard} />
+          <CreateForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.join_room && (
-          <JoinRoomModal onDiscard={handleDiscard} />
+          <JoinForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.edit_active_room && (
-          <EditRoomModal onDiscard={handleDiscard} />
+          <EditForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.add_member_to_active_room && (
-          <AddMemberRoomModal onDiscard={handleDiscard} />
+          <AddMemberForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.info_active_room && (
-          <InfoRoomModal onDiscard={handleDiscard} />
+          <InfoForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.leave_active_room && (
-          <LeaveRoomModal onDiscard={handleDiscard} />
+          <LeaveForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.delete_active_room && (
-          <DeleteRoomModal onDiscard={handleDiscard} />
+          <DeleteForm onDiscard={handleDiscard} />
         )}
         {modalType === ACTIONS.logout && (
-          <LogoutModal onDiscard={handleDiscard} />
+          <LogoutForm onDiscard={handleDiscard} />
         )}
       </ReactModal>
 
+      {/* notification container */}
       <ToastContainer />
     </>
   );

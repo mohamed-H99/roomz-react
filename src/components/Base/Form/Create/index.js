@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
-import { StateContext, createRoom } from "../../../appContext";
-import Button from "../../Base/Button";
+import { toast } from "react-toastify";
+import { StateContext, createRoom } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
 const initialState = {
@@ -10,7 +11,7 @@ const initialState = {
   },
 };
 
-export default function CreateRoomModal({ onDiscard }) {
+export default function CreateForm({ onDiscard }) {
   const [state, setState] = useState(initialState);
 
   const { currentUser } = useContext(StateContext);
@@ -22,38 +23,42 @@ export default function CreateRoomModal({ onDiscard }) {
       name: state.formData.name,
       uname: currentUser?.displayName, // [providerNaming]
       uid: currentUser?.uid,
-    });
-    setState(initialState);
-    onDiscard();
-  };
-
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    onDiscard();
+    })
+      .then(() => {
+        setState(initialState);
+        onDiscard(e);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      })
+      .finally(() => {
+        setState((prev) => ({ ...prev, loading: false }));
+      });
   };
 
   const handleChange = (e) => {
+    const name = e.target.name;
     const value = e.target.value;
     setState((prev) => ({
       ...prev,
       formData: {
         ...prev.formData,
-        name: value,
+        [name]: value,
       },
     }));
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
-          <h2 className="modal-header__title">{"Create Room"}</h2>
-          <p className="modal-header__subtitle">
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">{"Create Room"}</h2>
+          <p className="form-header__subtitle">
             {"Create and connect with your awesome community!"}
           </p>
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <div className="form-group">
             <label className="form-label">{"Room name"}</label>
             <input
@@ -61,27 +66,29 @@ export default function CreateRoomModal({ onDiscard }) {
               className="form-control"
               type="text"
               placeholder=""
+              required={true}
               value={state.formData["name"]}
               onChange={handleChange}
             />
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
               onClick={handleCreate}
+              type="submit"
             >
               {"Create"}
             </Button>
-            <Button variant="light" onClick={handleDiscard}>
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

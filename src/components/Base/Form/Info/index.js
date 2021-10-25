@@ -1,28 +1,21 @@
 import { useContext } from "react";
-import { StateContext } from "../../../appContext";
-import Button from "../../Base/Button";
+import { StateContext } from "../../../../appContext";
+import Button from "../../Button";
 import "./style.css";
 
-export default function InfoRoomModal({ onDiscard }) {
+export default function InfoForm({ onDiscard }) {
   const { activeRoom } = useContext(StateContext);
 
-  const copyId = () => {
-    navigator.clipboard.writeText(activeRoom?.id);
-  };
-
-  const handleDiscard = (e) => {
-    e.preventDefault();
-    onDiscard();
-  };
+  const copyIdToClipboard = () => navigator.clipboard.writeText(activeRoom?.id);
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
           <h2 className="text-2xl">{`${activeRoom?.name}`}</h2>
         </div>
 
-        <div className="modal-body text-gray">
+        <div className="form-body text-gray">
           <div>
             {`${activeRoom?.members.length} member${
               activeRoom?.members.length > 1 ? "s" : ""
@@ -37,22 +30,23 @@ export default function InfoRoomModal({ onDiscard }) {
             <label className="form-label">{`Room ID`}</label>
             <input
               className="btn btn-primary"
-              onClick={copyId}
-              disabled={false}
+              onClick={copyIdToClipboard}
+              disabled={true}
               value={`${activeRoom?.id}`}
               readOnly={true}
+              title={"copy id"}
             />
           </div>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
-            <Button variant="light" onClick={handleDiscard}>
+        <div className="form-footer">
+          <div className="form-footer__actions">
+            <Button variant="light" onClick={(e) => onDiscard(e)}>
               {"Discard"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
