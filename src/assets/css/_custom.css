@@ -1,5 +1,6 @@
 body {
-  @apply overflow-hidden w-screen h-screen bg-gray-lightest text-gray-darkest;
+  @apply overflow-hidden w-screen h-screen text-gray-darkest;
+  background: url("../media/bg.svg") no-repeat center center/cover;
 }
 
 .ReactModal__Overlay {
@@ -34,7 +35,7 @@ body {
   @apply inline-block text-gray text-xs ms-1;
 }
 .form-control {
-  @apply py-3 px-4 block w-full rounded-lg shadow bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors ring-2 ring-transparent focus:ring-2 focus:ring-gray;
+  @apply py-3 px-4 block w-full rounded-lg shadow-sm bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors ring-2 ring-transparent focus:ring-2 hover:shadow focus:ring-gray-light;
 }
 .form-wrapper {
   @apply px-3 py-1;

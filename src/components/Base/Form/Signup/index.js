@@ -20,11 +20,6 @@ const initialState = {
 export default function SignupForm({ onSwitch }) {
   const [state, setState] = useState(initialState);
 
-  useEffect(() => {
-    return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleSignup = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
@@ -66,11 +61,11 @@ export default function SignupForm({ onSwitch }) {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-wrapper">
-        <div className="modal-header">
-          <h2 className="modal-header__title">{"Signup"}</h2>
-          <p className="modal-header__subtitle">
+    <form className="form">
+      <div className="form-wrapper">
+        <div className="form-header">
+          <h2 className="form-header__title">{"Signup"}</h2>
+          <p className="form-header__subtitle">
             {"Join our Awesome! community members."}
           </p>
           {/* <div className="mt-4 flex gap-2 justify-center items-center">
@@ -80,7 +75,7 @@ export default function SignupForm({ onSwitch }) {
           </div> */}
         </div>
 
-        <div className="modal-body">
+        <div className="form-body">
           <form onSubmit={handleSignup}>
             <div className="form-group">
               <label className="form-label">{"Username"}</label>
@@ -121,8 +116,8 @@ export default function SignupForm({ onSwitch }) {
           </form>
         </div>
 
-        <div className="modal-footer">
-          <div className="modal-footer__actions">
+        <div className="form-footer">
+          <div className="form-footer__actions">
             <Button
               variant="primary"
               loading={state.loading}
@@ -132,11 +127,11 @@ export default function SignupForm({ onSwitch }) {
               {"Signup"}
             </Button>
             <Button variant="light" onClick={onSwitch}>
-              {"Login here"}
+              {"Switch to login"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
