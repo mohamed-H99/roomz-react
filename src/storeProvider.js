@@ -181,7 +181,7 @@ export default function StoreProvider({ children }) {
     })();
 
     return () => {};
-  }, [state.submittingForm]);
+  }, [state.signupForm.uname, state.submittingForm]);
 
   return (
     <DispatchContext.Provider value={dispatch}>
