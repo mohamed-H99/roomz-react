@@ -10,7 +10,7 @@ const colorsLevels = {
 
 module.exports = {
   purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
-  darkMode: "media", // or 'media' or 'class' , disable:false
+  darkMode: "media", // or 'media' or 'class'
   theme: {
     colors: {
       transparent: "transparent",
@@ -18,11 +18,11 @@ module.exports = {
       white: "#ffffff",
       black: "#000000",
       primary: {
-        lightest: colors.lime[colorsLevels.lightest],
-        light: colors.lime[colorsLevels.light],
-        DEFAULT: colors.lime[colorsLevels.DEFAULT],
-        dark: colors.lime[colorsLevels.dark],
-        darkest: colors.lime[colorsLevels.darkest],
+        lightest: colors.sky[colorsLevels.lightest],
+        light: colors.sky[colorsLevels.light],
+        DEFAULT: colors.sky[colorsLevels.DEFAULT],
+        dark: colors.sky[colorsLevels.dark],
+        darkest: colors.sky[colorsLevels.darkest],
       },
       success: {
         lightest: colors.green[colorsLevels.lightest],

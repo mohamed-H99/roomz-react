@@ -1,18 +1,19 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 import Chat from "./pages/Chat";
+import Auth from "./components/Auth";
 import Error from "./pages/Error";
 import ReactModal from "react-modal";
-import { ACTIONS, DispatchContext, StateContext } from "./appContext";
+import { ACTIONS, DispatchContext, StateContext } from "./storeProvider";
 import CreateForm from "./components/Base/Form/Create";
 import JoinForm from "./components/Base/Form/Join";
 import EditForm from "./components/Base/Form/Edit";
 import LeaveForm from "./components/Base/Form/Leave";
 import InfoForm from "./components/Base/Form/Info";
 import DeleteForm from "./components/Base/Form/Delete";
-import { ToastContainer } from "react-toastify";
 import AddMemberForm from "./components/Base/Form/AddMember";
 import LogoutForm from "./components/Base/Form/Logout";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./assets/css/style.css";
 
@@ -29,7 +30,13 @@ function App() {
   return (
     <>
       <Switch>
-        <Route path="/" exact component={Chat} />
+        <Route
+          path="/"
+          exact
+          render={(props) =>
+            state.authConfirmed ? <Chat {...props} /> : <Auth {...props} />
+          }
+        />
         <Route path="/404" exact component={Error} />
         <Redirect to="/404" />
       </Switch>

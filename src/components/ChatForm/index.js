@@ -5,7 +5,7 @@ import {
   ACTIONS,
   StateContext,
   sendMessageToRoom,
-} from "../../appContext";
+} from "../../storeProvider";
 import "./style.css";
 
 export default function ChatForm() {

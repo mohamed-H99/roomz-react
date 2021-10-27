@@ -1,7 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { useHistory } from "react-router";
-import { ACTIONS, DispatchContext, StateContext } from "../../../appContext";
+import { ACTIONS, DispatchContext, StateContext } from "../../../storeProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

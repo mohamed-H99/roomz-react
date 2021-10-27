@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { StateContext } from "../../appContext";
+import { StateContext } from "../../storeProvider";
 import ChatMessage from "../ChatMessage";
 import "./style.css";
 

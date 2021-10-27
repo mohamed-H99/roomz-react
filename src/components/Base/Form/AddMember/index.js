@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { StateContext, addMemberToRoom } from "../../../../appContext";
+import { StateContext, addMemberToRoom } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
@@ -29,10 +29,8 @@ export default function AddMemberForm({ onDiscard }) {
           onDiscard(e);
         })
         .catch((err) => {
-          toast.error(err.message);
-        })
-        .finally(() => {
           setState((prev) => ({ ...prev, loading: false }));
+          toast.error(err.message);
         });
     }
   };

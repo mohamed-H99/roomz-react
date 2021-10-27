@@ -1,21 +1,18 @@
 import React, { useContext } from "react";
 import SideMenu from "../../components/SideMenu";
 import ChatBox from "../../components/ChatBox";
-import { StateContext } from "../../appContext";
+import { StateContext } from "../../storeProvider";
 import "./style.css";
-import Auth from "../../components/Auth";
 
 export default function Chat() {
-  const { activeRoom, currentUser } = useContext(StateContext);
+  const { activeRoom } = useContext(StateContext);
 
-  return !!currentUser ? (
+  return (
     <div className="chat-page">
       <div className="chat-page__wrapper">
         <SideMenu />
-        {activeRoom && <ChatBox />}
+        {activeRoom ? <ChatBox /> : ""}
       </div>
     </div>
-  ) : (
-    <Auth />
   );
 }

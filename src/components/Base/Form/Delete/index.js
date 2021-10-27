@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { StateContext, deleteRoom } from "../../../../appContext";
+import { StateContext, deleteRoom } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
@@ -19,10 +19,8 @@ export default function DeleteForm({ onDiscard }) {
         onDiscard(e);
       })
       .catch((err) => {
-        toast.error(err.message);
-      })
-      .finally(() => {
         setLoading(false);
+        toast.error(err.message);
       });
   };
 

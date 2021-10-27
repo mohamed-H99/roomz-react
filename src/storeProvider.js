@@ -33,6 +33,7 @@ export const ACTIONS = {
   update_rooms: "update_rooms",
   filter_rooms: "filter_rooms",
   update_active_room: "update_active_room",
+  set_submitting_form: false,
   create_room: "create_room",
   join_room: "join_room",
   edit_active_room: "edit_active_room",
@@ -41,14 +42,28 @@ export const ACTIONS = {
   leave_active_room: "leave_room",
   delete_active_room: "delete_active_room",
   login: "login",
+  update_login_form: "update_login_form",
   signup: "signup",
+  update_signup_form: "update_signup_form",
   logout: "logout",
+  set_auth_confirmed: "set_auth_confirmed",
 };
 
 const initialState = {
   msgInput: "",
+  loginForm: {
+    email: "",
+    password: "",
+  },
+  signupForm: {
+    uname: "",
+    email: "",
+    password: "",
+  },
   modalIsOpen: false,
   currentUser: null,
+  authConfirmed: false,
+  submittingForm: false,
   rooms: [],
   activeRoom: null,
   menuOptions: [
@@ -70,7 +85,7 @@ const initialState = {
   ],
   roomOptions: [
     {
-      title: "Edit",
+      title: "Edit room",
       action: ACTIONS.edit_active_room,
       admin_access: true,
     },
@@ -80,12 +95,12 @@ const initialState = {
       admin_access: true,
     },
     {
-      title: "Leave",
+      title: "Leave room",
       action: ACTIONS.leave_active_room,
       admin_access: false,
     },
     {
-      title: "Delete",
+      title: "Delete room",
       action: ACTIONS.delete_active_room,
       admin_access: true,
     },
@@ -101,7 +116,7 @@ const initialState = {
   },
 };
 
-export default function AppContextProvider({ children }) {
+export default function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const fetchRooms = (client_id) => {
@@ -110,6 +125,7 @@ export default function AppContextProvider({ children }) {
       orderBy("created_at", "desc"),
       where("members_id", "array-contains", client_id)
     );
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let rooms = [];
       querySnapshot.forEach((doc) => {
@@ -127,41 +143,45 @@ export default function AppContextProvider({ children }) {
         rooms.push({
           ...doc.data(),
           id: doc.id,
-          has_notification: state.activeRoom?.id !== doc.id ? true : false,
+          has_notification: false,
           client_is_admin,
         });
       });
-
-      // querySnapshot.docChanges().forEach(({ type, doc }) => {
-      //   switch (type) {
-      //     case "added":
-      //       break;
-      //     case "modified":
-      //       break;
-      //     case "removed":
-      //       break;
-      //     default:
-      //       break;
-      //   }
-      // });
 
       dispatch({ type: ACTIONS.update_rooms, payload: rooms });
     });
   };
 
-  const fetchMainData = () => {
-    getAuth().onAuthStateChanged((cred) => {
-      if (cred?.uid) fetchRooms(cred.uid);
-      dispatch({ type: ACTIONS.update_current_user, payload: cred });
-    });
-  };
-
   useEffect(() => {
-    fetchMainData();
+    // IIFE
+    (async () => {
+      getAuth().onAuthStateChanged(async (cred) => {
+        if (cred) {
+          const exists = await checkUserInDB(cred.uid);
+          if (exists) {
+            dispatch({ type: ACTIONS.set_auth_confirmed, payload: true });
+          } else {
+            await updateProfile(cred, {
+              displayName: state.signupForm.uname,
+              photoURL: "https://via.placeholder.com/64",
+            });
+            await addUser({
+              uid: cred.uid,
+              uname: cred.displayName,
+            });
+
+            dispatch({ type: ACTIONS.set_auth_confirmed, payload: true });
+          }
+
+          fetchRooms(cred.uid);
+        }
+
+        dispatch({ type: ACTIONS.update_current_user, payload: cred });
+      });
+    })();
 
     return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [state.submittingForm]);
 
   return (
     <DispatchContext.Provider value={dispatch}>
@@ -211,17 +231,36 @@ function reducer(state, { type, payload }) {
         draftState["activeRoom"] = payload;
       });
 
+    case ACTIONS.set_auth_confirmed:
+      return produce(state, (draftState) => {
+        draftState["authConfirmed"] = payload;
+      });
+
+    case ACTIONS.set_submitting_form:
+      return produce(state, (draftState) => {
+        draftState["submittingForm"] = payload;
+      });
+
+    case ACTIONS.update_login_form:
+      return produce(state, (draftState) => {
+        draftState["loginForm"] = {
+          ...state.loginForm,
+          ...payload,
+        };
+      });
+
+    case ACTIONS.update_signup_form:
+      return produce(state, (draftState) => {
+        draftState["signupForm"] = {
+          ...state.signupForm,
+          ...payload,
+        };
+      });
+
     default:
       return state;
   }
 }
-
-// ===============
-// msg functions
-
-export const errorMsg = (msg) => ({ type: "error", message: msg });
-
-export const successMsg = (msg) => ({ type: "success", message: msg });
 
 // ================
 // functions (auth)
@@ -229,13 +268,13 @@ export const successMsg = (msg) => ({ type: "success", message: msg });
 export const loginWithEmailAndPassword = ({ email, password }) =>
   signInWithEmailAndPassword(getAuth(), email, password);
 
-export const signUpWithEmailAndPassword = ({ email, password }) =>
+export const registerWithEmailAndPassword = ({ email, password }) =>
   createUserWithEmailAndPassword(getAuth(), email, password);
 
-export const updateNewUserProfile = ({ uname }) =>
+export const updateNewUserProfile = ({ uname, avatar }) =>
   updateProfile(getAuth(), {
     displayName: uname,
-    photoURL: "",
+    photoURL: avatar,
   });
 
 export const logout = () => signOut(getAuth());
@@ -245,6 +284,12 @@ export const logout = () => signOut(getAuth());
 
 // =====================
 // functions (firestore)
+
+export const checkUserInDB = async (uid) => {
+  const usersRef = collection(getFirestore(), "users");
+  const userRef = await getDoc(doc(usersRef, uid));
+  return userRef.data();
+};
 
 export const addUser = ({ uid, uname }) => {
   const usersRef = collection(getFirestore(), "users");
@@ -278,7 +323,7 @@ export const editRoom = ({ id, name }) => {
   });
 };
 
-export const addMemberToRoom = async ({ id: room_id, uid, uname }) => {
+export const addMemberToRoom = async ({ id: room_id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", room_id);
   const roomDocData = (await getDoc(roomDocRef)).data();
   const userRef = doc(getFirestore(), "users", uid);
@@ -286,16 +331,22 @@ export const addMemberToRoom = async ({ id: room_id, uid, uname }) => {
   if (roomDocData && userRef) {
     const oldMembers = roomDocData.members;
     const oldMembersId = roomDocData.members_id;
+    const user = await getDoc(userRef);
+    console.log("user", user.data());
 
     const member =
       oldMembers.findIndex((m) => m.uid === uid) === -1 ? false : true;
     if (!member) {
+      console.log("not a mem");
+      console.log(oldMembers);
+      console.log(oldMembersId);
+      console.log(uid, user);
       return updateDoc(roomDocRef, {
-        members: [...oldMembers, { uid, uname, is_admin: false }],
+        members: [...oldMembers, { uid, uname: "", is_admin: false }],
         members_id: [...oldMembersId, uid],
       });
-    } else return errorMsg(initialState.errorMessages.member_exists);
-  } else return errorMsg(initialState.errorMessages.room_not_found);
+    } else return initialState.errorMessages.member_exists;
+  } else return initialState.errorMessages.room_not_found;
 };
 
 export const leaveRoom = async ({ id, uid }) => {
@@ -313,8 +364,8 @@ export const leaveRoom = async ({ id, uid }) => {
         members: [...newMembers],
         members_id: [...newMembersId],
       });
-    } else return errorMsg(initialState.errorMessages.member_not_found);
-  } else return errorMsg(initialState.errorMessages.room_not_found);
+    } else return initialState.errorMessages.member_not_found;
+  } else return initialState.errorMessages.room_not_found;
 };
 
 export const deleteRoom = ({ id }) => {

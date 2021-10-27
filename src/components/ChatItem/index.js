@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ACTIONS, DispatchContext } from "../../appContext";
+import { ACTIONS, DispatchContext } from "../../storeProvider";
 import "./style.css";
 
 export default function ChatItem({ data, onSelect }) {

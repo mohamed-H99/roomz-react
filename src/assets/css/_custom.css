@@ -36,6 +36,23 @@ body {
 }
 .form-control {
   @apply py-3 px-4 block w-full rounded-lg shadow-sm bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors ring-2 ring-transparent focus:ring-2 hover:shadow focus:ring-gray-light;
+  height: 50px;
+  max-height: 50px;
+}
+.input-group {
+  @apply relative w-full;
+  height: 50px;
+}
+.input-group .form-control {
+  @apply absolute w-full h-full pe-8;
+}
+.input-group svg {
+  @apply absolute top-1/2;
+  inset-inline-end: 1rem;
+  transform: translateY(-50%);
+}
+.input-group .input-icon {
+  @apply cursor-pointer;
 }
 .form-wrapper {
   @apply px-3 py-1;

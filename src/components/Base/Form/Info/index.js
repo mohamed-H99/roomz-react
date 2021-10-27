@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { StateContext } from "../../../../appContext";
+import { StateContext } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 

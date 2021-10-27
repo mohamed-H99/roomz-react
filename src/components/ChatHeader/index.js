@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ACTIONS, DispatchContext, StateContext } from "../../appContext";
+import { ACTIONS, DispatchContext, StateContext } from "../../storeProvider";
 import Dropdown from "../Base/Dropdown";
 import { Info, Settings } from "react-feather";
 import "./style.css";

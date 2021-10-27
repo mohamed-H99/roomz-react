@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { logout } from "../../../../appContext";
+import { ACTIONS, DispatchContext, logout } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
 export default function LogoutForm({ onDiscard }) {
+  const dispatch = useContext(DispatchContext);
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async (e) => {
@@ -12,13 +13,12 @@ export default function LogoutForm({ onDiscard }) {
     setLoading(true);
     await logout()
       .then(() => {
+        dispatch({ type: ACTIONS.set_auth_confirmed, payload: false });
         onDiscard(e);
       })
       .catch((err) => {
-        toast.error(err.message);
-      })
-      .finally(() => {
         setLoading(false);
+        toast.error(err.message);
       });
   };
 

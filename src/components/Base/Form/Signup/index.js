@@ -1,43 +1,37 @@
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
+import { Eye, EyeOff } from "react-feather";
 import { toast } from "react-toastify";
 import {
-  addUser,
-  signUpWithEmailAndPassword,
-  updateNewUserProfile,
-} from "../../../../appContext";
+  registerWithEmailAndPassword,
+  ACTIONS,
+  DispatchContext,
+  StateContext,
+} from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
-const initialState = {
-  loading: false,
-  formData: {
-    uname: "",
-    email: "",
-    password: "",
-  },
-};
+export default function SignupForm({ onSwitch, onSubmit }) {
+  const state = useContext(StateContext);
+  const dispatch = useContext(DispatchContext);
 
-export default function SignupForm({ onSwitch }) {
-  const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setState((prev) => ({ ...prev, loading: true }));
-    signUpWithEmailAndPassword({
-      email: state.formData.email,
-      password: state.formData.password,
+    setLoading(true);
+    dispatch({ type: ACTIONS.set_submitting_form, payload: true });
+
+    await registerWithEmailAndPassword({
+      ...state.signupForm,
     })
-      .then(async (res) => {
-        console.log("res: ", res);
-        await updateNewUserProfile({ uname: state.formData.uname });
-        await addUser({ uid: res.user.uid, uname: state.formData.uname });
-        setState(initialState);
+      .then(() => {
+        setLoading(false);
+        onSubmit();
       })
       .catch((err) => {
+        setLoading((prev) => ({ ...prev, loading: false }));
         toast.error(err.message);
-      })
-      .finally(() => {
-        setState((prev) => ({ ...prev, loading: false }));
       });
   };
 
@@ -51,17 +45,21 @@ export default function SignupForm({ onSwitch }) {
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({
-      ...prev,
-      formData: {
-        ...prev.formData,
+    dispatch({
+      type: ACTIONS.update_signup_form,
+      payload: {
         [name]: value,
       },
-    }));
+    });
+  };
+
+  const togglePassword = (e) => {
+    e.stopPropagation();
+    setShowPassword(!showPassword);
   };
 
   return (
-    <form className="form">
+    <form className="form" onSubmit={handleSignup}>
       <div className="form-wrapper">
         <div className="form-header">
           <h2 className="form-header__title">{"Signup"}</h2>
@@ -76,51 +74,54 @@ export default function SignupForm({ onSwitch }) {
         </div>
 
         <div className="form-body">
-          <form onSubmit={handleSignup}>
-            <div className="form-group">
-              <label className="form-label">{"Username"}</label>
-              <input
-                name="uname"
-                className="form-control"
-                type="text"
-                required={true}
-                placeholder=""
-                value={state.formData["uname"]}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">{"Email address"}</label>
-              <input
-                name="email"
-                className="form-control"
-                type="email"
-                required={true}
-                placeholder=""
-                value={state.formData["email"]}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">{"Create Password"}</label>
+          <div className="form-group">
+            <label className="form-label">{"Username"}</label>
+            <input
+              name="uname"
+              className="form-control"
+              type="text"
+              required={true}
+              placeholder=""
+              value={state.signupForm["uname"]}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">{"Email address"}</label>
+            <input
+              name="email"
+              className="form-control"
+              type="email"
+              required={true}
+              placeholder=""
+              value={state.signupForm["email"]}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">{"Create Password"}</label>
+            <div className="input-group">
               <input
                 name="password"
                 className="form-control"
-                type="password"
+                type={state.showPassword ? "text" : "password"}
                 required={true}
                 placeholder=""
-                value={state.formData["password"]}
+                value={state.signupForm["password"]}
                 onChange={handleChange}
               />
+              <span className="input-icon" onClick={togglePassword}>
+                {showPassword ? <Eye /> : <EyeOff />}
+              </span>
             </div>
-          </form>
+          </div>
         </div>
 
         <div className="form-footer">
           <div className="form-footer__actions">
             <Button
               variant="primary"
-              loading={state.loading}
+              loading={loading}
               onClick={handleSignup}
               type="submit"
             >

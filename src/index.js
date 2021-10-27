@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { initializeApp } from "firebase/app";
-import AppContextProvider from "./appContext";
+import StoreProvider from "./storeProvider";
 import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 import "./index.css";
@@ -17,11 +17,11 @@ initializeApp({
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppContextProvider>
+    <StoreProvider>
       <Router>
         <App />
       </Router>
-    </AppContextProvider>
+    </StoreProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

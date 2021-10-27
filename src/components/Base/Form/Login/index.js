@@ -1,36 +1,35 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import {
+  ACTIONS,
+  DispatchContext,
   loginWithEmailAndPassword,
+  StateContext,
   // loginWithGoogle,
-} from "../../../../appContext";
+} from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
-const initialState = {
-  loading: false,
-  formData: {
-    email: "",
-    password: "",
-  },
-};
+export default function LoginForm({ onSwitch, onSubmit }) {
+  const dispatch = useContext(DispatchContext);
+  const state = useContext(StateContext);
 
-export default function LoginForm({ onSwitch }) {
-  const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (state.formData.email.trim() && state.formData.password.trim()) {
-      setState((prev) => ({ ...prev, loading: true }));
-      loginWithEmailAndPassword({ ...state.formData })
+    if (state.loginForm.email.trim() && state.loginForm.password.trim()) {
+      setLoading(true);
+      dispatch({ type: ACTIONS.set_submitting_form, payload: true });
+
+      await loginWithEmailAndPassword({ ...state.loginForm })
         .then(() => {
-          setState(initialState);
+          setLoading(false);
+          onSubmit();
         })
         .catch((err) => {
+          setLoading(false);
           toast.error(err.message);
-        })
-        .finally(() => {
-          setState((prev) => ({ ...prev, loading: false }));
         });
     }
   };
@@ -45,17 +44,16 @@ export default function LoginForm({ onSwitch }) {
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setState((prev) => ({
-      ...prev,
-      formData: {
-        ...prev.formData,
+    dispatch({
+      type: ACTIONS.update_login_form,
+      payload: {
         [name]: value,
       },
-    }));
+    });
   };
 
   return (
-    <form className="form">
+    <form className="form" onSubmit={handleLogin}>
       <div className="form-wrapper">
         <div className="form-header">
           <h2 className="form-header__title">{"Login"}</h2>
@@ -70,39 +68,37 @@ export default function LoginForm({ onSwitch }) {
         </div>
 
         <div className="form-body">
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">{"Email address"}</label>
-              <input
-                name="email"
-                className="form-control"
-                type="email"
-                required={true}
-                placeholder=""
-                value={state.formData["email"]}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">{"Password"}</label>
-              <input
-                name="password"
-                className="form-control"
-                type="password"
-                required={true}
-                placeholder=""
-                value={state.formData["password"]}
-                onChange={handleChange}
-              />
-            </div>
-          </form>
+          <div className="form-group">
+            <label className="form-label">{"Email address"}</label>
+            <input
+              name="email"
+              className="form-control"
+              type="email"
+              required={true}
+              placeholder=""
+              value={state.loginForm["email"]}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">{"Password"}</label>
+            <input
+              name="password"
+              className="form-control"
+              type="password"
+              required={true}
+              placeholder=""
+              value={state.loginForm["password"]}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className="form-footer">
           <div className="form-footer__actions">
             <Button
               variant="primary"
-              loading={state.loading}
+              loading={loading}
               onClick={handleLogin}
               type="submit"
             >

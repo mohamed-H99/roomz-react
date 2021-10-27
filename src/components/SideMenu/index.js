@@ -3,7 +3,7 @@ import Dropdown from "../Base/Dropdown";
 import ChatItem from "../ChatItem";
 import { Search, Users, Menu } from "react-feather";
 import "./style.css";
-import { StateContext } from "../../appContext";
+import { StateContext } from "../../storeProvider";
 
 export default function SideMenu() {
   const { rooms, menuOptions } = useContext(StateContext);
