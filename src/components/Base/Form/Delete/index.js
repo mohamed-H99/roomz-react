@@ -5,7 +5,7 @@ import Button from "../../Button";
 import "./style.css";
 
 export default function DeleteForm({ onDiscard }) {
-  const { activeRoom } = useContext(StateContext);
+  const { activeRoom, currentUser } = useContext(StateContext);
 
   const [loading, setLoading] = useState(false);
 
@@ -14,6 +14,7 @@ export default function DeleteForm({ onDiscard }) {
     setLoading(true);
     await deleteRoom({
       id: activeRoom?.id,
+      uid: currentUser?.uid,
     })
       .then(() => {
         onDiscard(e);

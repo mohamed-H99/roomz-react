@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { StateContext, addMemberToRoom } from "../../../../storeProvider";
+import { StateContext, addMemberToRoomById } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
@@ -20,7 +20,7 @@ export default function JoinForm({ onDiscard }) {
     e?.preventDefault();
     if (state.formData.id.trim()) {
       setState((prev) => ({ ...prev, loading: true }));
-      await addMemberToRoom({
+      await addMemberToRoomById({
         id: state.formData.id.trim(),
         uid: currentUser?.uid,
         uname: currentUser?.displayName,

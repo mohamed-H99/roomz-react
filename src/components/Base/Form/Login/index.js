@@ -5,12 +5,11 @@ import {
   DispatchContext,
   loginWithEmailAndPassword,
   StateContext,
-  // loginWithGoogle,
 } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
-export default function LoginForm({ onSwitch, onSubmit }) {
+export default function LoginForm({ onSwitch }) {
   const dispatch = useContext(DispatchContext);
   const state = useContext(StateContext);
 
@@ -20,12 +19,11 @@ export default function LoginForm({ onSwitch, onSubmit }) {
     e.preventDefault();
     if (state.loginForm.email.trim() && state.loginForm.password.trim()) {
       setLoading(true);
-      dispatch({ type: ACTIONS.set_submitting_form, payload: true });
 
       await loginWithEmailAndPassword({ ...state.loginForm })
         .then(() => {
           setLoading(false);
-          onSubmit();
+          dispatch({ type: ACTIONS.reset_login_form });
         })
         .catch((err) => {
           setLoading(false);
@@ -33,13 +31,6 @@ export default function LoginForm({ onSwitch, onSubmit }) {
         });
     }
   };
-
-  // const handleGoogle = async (e) => {
-  //   e.preventDefault();
-  //   setState((prev) => ({ ...prev, loading: true }));
-  //   await loginWithGoogle();
-  //   setState(initialState);
-  // };
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -60,11 +51,6 @@ export default function LoginForm({ onSwitch, onSubmit }) {
           <p className="form-header__subtitle">
             {"We appreciate your coming back."}
           </p>
-          {/* <div className="mt-4 flex gap-2 justify-center items-center">
-            <Button variant="primary" onClick={handleGoogle}>
-              {"Google"}
-            </Button>
-          </div> */}
         </div>
 
         <div className="form-body">

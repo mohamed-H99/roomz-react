@@ -10,7 +10,7 @@ import {
 import Button from "../../Button";
 import "./style.css";
 
-export default function SignupForm({ onSwitch, onSubmit }) {
+export default function SignupForm({ onSwitch }) {
   const state = useContext(StateContext);
   const dispatch = useContext(DispatchContext);
 
@@ -20,27 +20,19 @@ export default function SignupForm({ onSwitch, onSubmit }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-    dispatch({ type: ACTIONS.set_submitting_form, payload: true });
 
     await registerWithEmailAndPassword({
       ...state.signupForm,
     })
       .then(() => {
         setLoading(false);
-        onSubmit();
+        dispatch({ type: ACTIONS.reset_signup_form });
       })
       .catch((err) => {
         setLoading((prev) => ({ ...prev, loading: false }));
         toast.error(err.message);
       });
   };
-
-  // const handleGoogle = async (e) => {
-  //   e.preventDefault();
-  //   setState((prev) => ({ ...prev, loading: true }));
-  //   await loginWithGoogle();
-  //   setState(initialState);
-  // };
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -66,11 +58,6 @@ export default function SignupForm({ onSwitch, onSubmit }) {
           <p className="form-header__subtitle">
             {"Join our Awesome! community members."}
           </p>
-          {/* <div className="mt-4 flex gap-2 justify-center items-center">
-            <Button variant="primary" onClick={handleGoogle}>
-              {"Google"}
-            </Button>
-          </div> */}
         </div>
 
         <div className="form-body">
@@ -104,7 +91,7 @@ export default function SignupForm({ onSwitch, onSubmit }) {
               <input
                 name="password"
                 className="form-control"
-                type={state.showPassword ? "text" : "password"}
+                type={showPassword ? "text" : "password"}
                 required={true}
                 placeholder=""
                 value={state.signupForm["password"]}

@@ -8,6 +8,7 @@ const initialState = {
   loading: false,
   formData: {
     name: "",
+    photoURL: "https://via.placeholder.com/64",
   },
 };
 
@@ -21,8 +22,9 @@ export default function CreateForm({ onDiscard }) {
     setState((prev) => ({ ...prev, loading: true }));
     await createRoom({
       name: state.formData.name,
-      uname: currentUser?.displayName, // [providerNaming]
+      uname: currentUser?.displayName,
       uid: currentUser?.uid,
+      photoURL: state.formData.photoURL,
     })
       .then(() => {
         setState(initialState);

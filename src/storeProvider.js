@@ -47,6 +47,8 @@ export const ACTIONS = {
   update_signup_form: "update_signup_form",
   logout: "logout",
   set_auth_confirmed: "set_auth_confirmed",
+  reset_login_form: "reset_login_form",
+  reset_signup_form: "reset_signup_form",
 };
 
 const initialState = {
@@ -111,6 +113,7 @@ const initialState = {
     room_exists: "Room is already exists",
     room_not_found: "Room is not found",
     auth_wrong: "Wrong email or password",
+    user_not_found: "User is not found in our system",
     auth_not_found: "User is not found",
     weak_password: "Weak password, Try something longer",
   },
@@ -122,8 +125,8 @@ export default function StoreProvider({ children }) {
   const fetchRooms = (client_id) => {
     const q = query(
       collection(getFirestore(), "rooms"),
-      orderBy("created_at", "desc"),
-      where("members_id", "array-contains", client_id)
+      orderBy("createdAt", "desc"),
+      where("membersId", "array-contains", client_id)
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -131,11 +134,11 @@ export default function StoreProvider({ children }) {
       querySnapshot.forEach((doc) => {
         const members = doc.data().members;
         const membersLen = members?.length;
-        let client_is_admin = false;
+        let client_isAdmin = false;
         if (membersLen) {
           for (let i = 0; i < membersLen; i++) {
-            if (members[i].uid === client_id && members[i].is_admin) {
-              client_is_admin = true;
+            if (members[i].uid === client_id && members[i].isAdmin) {
+              client_isAdmin = true;
               break;
             }
           }
@@ -144,7 +147,7 @@ export default function StoreProvider({ children }) {
           ...doc.data(),
           id: doc.id,
           has_notification: false,
-          client_is_admin,
+          client_isAdmin,
         });
       });
 
@@ -158,24 +161,19 @@ export default function StoreProvider({ children }) {
       getAuth().onAuthStateChanged(async (cred) => {
         if (cred) {
           const exists = await checkUserInDB(cred.uid);
-          if (exists) {
-            dispatch({ type: ACTIONS.set_auth_confirmed, payload: true });
-          } else {
+          if (!exists) {
             await updateProfile(cred, {
               displayName: state.signupForm.uname,
               photoURL: "https://via.placeholder.com/64",
             });
-            await addUser({
+            await addUserToDB({
               uid: cred.uid,
-              uname: cred.displayName,
+              uname: cred.displayName || state.signupForm.uname,
             });
-
             dispatch({ type: ACTIONS.set_auth_confirmed, payload: true });
-          }
-
+          } else dispatch({ type: ACTIONS.set_auth_confirmed, payload: true });
           fetchRooms(cred.uid);
         }
-
         dispatch({ type: ACTIONS.update_current_user, payload: cred });
       });
     })();
@@ -236,11 +234,6 @@ function reducer(state, { type, payload }) {
         draftState["authConfirmed"] = payload;
       });
 
-    case ACTIONS.set_submitting_form:
-      return produce(state, (draftState) => {
-        draftState["submittingForm"] = payload;
-      });
-
     case ACTIONS.update_login_form:
       return produce(state, (draftState) => {
         draftState["loginForm"] = {
@@ -257,6 +250,16 @@ function reducer(state, { type, payload }) {
         };
       });
 
+    case ACTIONS.reset_login_form:
+      return produce(state, (draftState) => {
+        draftState["loginForm"] = { ...initialState.loginForm };
+      });
+
+    case ACTIONS.reset_signup_form:
+      return produce(state, (draftState) => {
+        draftState["signupForm"] = { ...initialState.signupForm };
+      });
+
     default:
       return state;
   }
@@ -271,16 +274,7 @@ export const loginWithEmailAndPassword = ({ email, password }) =>
 export const registerWithEmailAndPassword = ({ email, password }) =>
   createUserWithEmailAndPassword(getAuth(), email, password);
 
-export const updateNewUserProfile = ({ uname, avatar }) =>
-  updateProfile(getAuth(), {
-    displayName: uname,
-    photoURL: avatar,
-  });
-
 export const logout = () => signOut(getAuth());
-
-// export const loginWithGoogle = () =>
-//   signInWithPopup(getAuth(), new GoogleAuthProvider());
 
 // =====================
 // functions (firestore)
@@ -291,7 +285,7 @@ export const checkUserInDB = async (uid) => {
   return userRef.data();
 };
 
-export const addUser = ({ uid, uname }) => {
+export const addUserToDB = ({ uid, uname }) => {
   const usersRef = collection(getFirestore(), "users");
   return setDoc(doc(usersRef, uid), {
     uid,
@@ -299,78 +293,172 @@ export const addUser = ({ uid, uname }) => {
   });
 };
 
-export const createRoom = ({ uid, uname, name }) => {
+export const createRoom = ({ uid, uname, name, photoURL }) => {
   const roomsRef = collection(getFirestore(), "rooms");
   return setDoc(doc(roomsRef), {
     name: name,
     messages: [],
-    members_id: [uid],
+    membersId: [uid],
     members: [
       {
         uid: uid,
         uname: uname,
-        is_admin: true,
+        isAdmin: true,
       },
     ],
-    created_at: Timestamp.fromDate(new Date()),
+    createdAt: Timestamp.fromDate(new Date()),
   });
 };
 
-export const editRoom = ({ id, name }) => {
+export const editRoom = ({ id, name, photoURL }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
   return updateDoc(roomDocRef, {
     name,
+    photoURL: photoURL ? photoURL : "", // ignore
   });
 };
 
-export const addMemberToRoom = async ({ id: room_id, uid }) => {
+export const addMemberToRoomById = async ({ id: room_id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", room_id);
   const roomDocData = (await getDoc(roomDocRef)).data();
   const userRef = doc(getFirestore(), "users", uid);
 
   if (roomDocData && userRef) {
     const oldMembers = roomDocData.members;
-    const oldMembersId = roomDocData.members_id;
-    const user = await getDoc(userRef);
-    console.log("user", user.data());
+    const oldMembersId = roomDocData.membersId;
 
-    const member =
+    const memberAlreadyExists =
       oldMembers.findIndex((m) => m.uid === uid) === -1 ? false : true;
-    if (!member) {
-      console.log("not a mem");
-      console.log(oldMembers);
-      console.log(oldMembersId);
-      console.log(uid, user);
-      return updateDoc(roomDocRef, {
-        members: [...oldMembers, { uid, uname: "", is_admin: false }],
-        members_id: [...oldMembersId, uid],
-      });
+    const userExists = checkUserInDB(uid);
+    if (!memberAlreadyExists) {
+      if (userExists) {
+        return updateDoc(roomDocRef, {
+          members: [...oldMembers, { uid, uname: "", isAdmin: false }],
+          membersId: [...oldMembersId, uid],
+        });
+      } else return initialState.errorMessages.user_not_found;
     } else return initialState.errorMessages.member_exists;
   } else return initialState.errorMessages.room_not_found;
 };
 
 export const leaveRoom = async ({ id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
-  const roomDocData = (await getDoc(roomDocRef)).data();
-  if (roomDocData) {
-    const oldMembers = roomDocData.members;
-    const oldMembersId = roomDocData.members_id;
-    const member = oldMembers.find((m) => m.uid === uid);
-    if (member) {
-      // && memberId
-      const newMembers = oldMembers.filter((m) => m.uid !== member.uid);
-      const newMembersId = oldMembersId.filter((m_id) => m_id !== member.uid);
-      return updateDoc(roomDocRef, {
+  const roomExists = checkRoomInDB(id);
+  const memberExists = checkMemberInRoom(id, uid);
+  if (roomExists) {
+    if (memberExists) {
+      const oldMembers = roomExists.members;
+      const oldMembersId = roomExists.membersId;
+      const newMembers = oldMembers.filter(
+        (mem) => mem.uid !== memberExists.uid
+      );
+      const newMembersId = oldMembersId.filter(
+        (m_id) => m_id !== memberExists.uid
+      );
+      const roomHasAdmins = checkRoomHasAdmins(id);
+      return await updateDoc(roomDocRef, {
         members: [...newMembers],
-        members_id: [...newMembersId],
+        membersId: [...newMembersId],
+      }).then(async () => {
+        if (!roomHasAdmins) {
+          const randomMember = getRandomMember(id);
+          await setAdminToRoom(id, randomMember.uid);
+        } else {
+          return await deleteRoom(roomExists.id);
+        }
       });
     } else return initialState.errorMessages.member_not_found;
   } else return initialState.errorMessages.room_not_found;
 };
 
-export const deleteRoom = ({ id }) => {
+export const deleteRoom = ({ id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
-  return deleteDoc(roomDocRef);
+  const memberExists = checkMemberInRoom(id, uid);
+  const memberIsAdmin = checkMemberIsAdmin(id, uid);
+
+  if (memberExists) {
+    if (memberIsAdmin) {
+      return deleteDoc(roomDocRef);
+    }
+  }
+};
+
+export const getRandomMember = (id) => {
+  const roomExists = checkRoomInDB(id);
+
+  if (roomExists) {
+    const roomLength = roomExists.membersId;
+    const randIndex = Math.floor(Math.random() * roomLength);
+    return roomExists.members[randIndex];
+  }
+};
+
+export const checkRoomHasNoMembers = async (id) => {
+  const roomExists = checkRoomInDB(id);
+  return roomExists.membersId.length;
+};
+
+export const checkRoomHasAdmins = async (id) => {
+  const roomExists = checkRoomInDB(id);
+  const members = roomExists.members;
+
+  const isAdmin = members.find((mem) => mem.isAdmin === true);
+  return isAdmin;
+};
+
+export const checkMemberIsAdmin = async (id, uid) => {
+  const roomExists = checkRoomInDB(id);
+  const memberExists = checkMemberInRoom(id, uid);
+
+  if (memberExists) {
+    const oldMembers = roomExists.members;
+    const memberInRoom = oldMembers.find((mem) => mem.uid === memberExists.uid);
+    return memberInRoom.isAdmin;
+  }
+};
+
+export const setAdminToRoom = async ({ id, uid }) => {
+  const roomExists = checkRoomInDB(id);
+  const userExists = checkUserInDB(uid);
+  const memberExists = checkMemberInRoom(id, uid);
+
+  if (roomExists) {
+    if (userExists) {
+      if (memberExists) {
+        const oldMembers = roomExists.members;
+
+        const newMembers = oldMembers.map((mem) => {
+          if (mem.uid === memberExists.uid) {
+            return {
+              ...mem,
+              isAdmin: true,
+            };
+          }
+          return mem;
+        });
+
+        // update room
+      }
+    }
+  }
+};
+
+export const checkRoomInDB = async (id) => {
+  const roomDocRef = doc(getFirestore(), "rooms", id);
+  const roomDocData = (await getDoc(roomDocRef)).data();
+  return roomDocData;
+};
+
+export const checkMemberInRoom = async (id, uid) => {
+  const roomExists = checkRoomInDB(id);
+  const userExists = checkUserInDB(uid);
+
+  if (roomExists) {
+    if (userExists) {
+      const oldMembersId = roomExists.membersId;
+      return oldMembersId.includes(userExists.uid);
+    }
+  }
 };
 
 export const sendMessageToRoom = (oldMessages, { id, uid, uname, content }) => {
@@ -382,7 +470,7 @@ export const sendMessageToRoom = (oldMessages, { id, uid, uname, content }) => {
         uid,
         uname,
         content,
-        created_at: Timestamp.fromDate(new Date()),
+        createdAt: Timestamp.fromDate(new Date()),
       },
     ],
   });

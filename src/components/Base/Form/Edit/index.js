@@ -8,6 +8,7 @@ const initialState = {
   loading: false,
   formData: {
     name: "",
+    photoURL: "https://via.placeholder.com/64",
   },
 };
 
@@ -29,6 +30,7 @@ export default function EditForm({ onDiscard }) {
     await editRoom({
       name: state.formData.name,
       id: activeRoom?.id,
+      photoURL: state.formData.photoURL,
     })
       .then(() => {
         setState(initialState);

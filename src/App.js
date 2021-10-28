@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 import Chat from "./pages/Chat";
 import Auth from "./components/Auth";

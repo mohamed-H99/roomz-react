@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import "./style.css";
 
 export default function ChatMessage({ data, self }) {
-  const dateDistanceToNow = formatDistanceToNow(data?.created_at.toDate());
+  const dateDistanceToNow = formatDistanceToNow(data?.createdAt.toDate());
 
   return (
     <div className={`chat-message ${self ? "__self" : ""}`}>
