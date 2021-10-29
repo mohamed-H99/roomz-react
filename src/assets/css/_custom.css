@@ -1,10 +1,10 @@
 body {
-  @apply overflow-hidden w-screen h-screen text-gray-darkest;
+  @apply overflow-x-hidden w-screen h-screen text-gray-darkest;
   background: url("../media/bg.svg") no-repeat center center/cover;
 }
 
 .ReactModal__Overlay {
-  @apply z-50;
+  @apply z-50 overflow-y-auto;
 }
 
 .ReactModal__Content {
@@ -14,7 +14,7 @@ body {
   border: 0 !important;
   border-radius: 0.75rem !important;
   transform: translate(-50%, -50%);
-  @apply shadow-lg border border-gray-light w-11/12 max-w-xl;
+  @apply shadow-xl border border-gray-light w-11/12 max-w-xl max-h-full;
 }
 
 /* =========== */
@@ -35,7 +35,7 @@ body {
   @apply inline-block text-gray text-xs ms-1;
 }
 .form-control {
-  @apply py-3 px-4 block w-full rounded-lg shadow-sm bg-white text-gray-dark text-sm focus:outline-none border border-gray-lightest transition-colors ring-2 ring-transparent focus:ring-2 hover:shadow focus:ring-gray-light;
+  @apply py-3 px-4 block w-full rounded-lg shadow-sm bg-white text-gray-dark text-sm focus:outline-none border border-gray-light transition-colors ring-2 ring-transparent focus:ring-2 hover:shadow focus:ring-gray-light;
   height: 50px;
   max-height: 50px;
 }

@@ -114,6 +114,7 @@ const initialState = {
     room_not_found: "Room is not found",
     auth_wrong: "Wrong email or password",
     user_not_found: "User is not found in our system",
+    user_exists: "User is already exists",
     auth_not_found: "User is not found",
     weak_password: "Weak password, Try something longer",
   },
@@ -285,12 +286,16 @@ export const checkUserInDB = async (uid) => {
   return userRef.data();
 };
 
-export const addUserToDB = ({ uid, uname }) => {
+export const addUserToDB = async ({ uid, uname }) => {
   const usersRef = collection(getFirestore(), "users");
-  return setDoc(doc(usersRef, uid), {
-    uid,
-    uname,
-  });
+  const userExists = await checkUserInDB(uid);
+
+  if (!userExists) {
+    return setDoc(doc(usersRef, uid), {
+      uid,
+      uname,
+    });
+  } else return initialState.errorMessages.user_exists;
 };
 
 export const createRoom = ({ uid, uname, name, photoURL }) => {
@@ -329,7 +334,7 @@ export const addMemberToRoomById = async ({ id: room_id, uid }) => {
 
     const memberAlreadyExists =
       oldMembers.findIndex((m) => m.uid === uid) === -1 ? false : true;
-    const userExists = checkUserInDB(uid);
+    const userExists = await checkUserInDB(uid);
     if (!memberAlreadyExists) {
       if (userExists) {
         return updateDoc(roomDocRef, {
@@ -341,10 +346,10 @@ export const addMemberToRoomById = async ({ id: room_id, uid }) => {
   } else return initialState.errorMessages.room_not_found;
 };
 
-export const leaveRoom = async ({ id, uid }) => {
+export const removeMemberFromRoomById = async ({ id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
-  const roomExists = checkRoomInDB(id);
-  const memberExists = checkMemberInRoom(id, uid);
+  const roomExists = await checkRoomInDB(id);
+  const memberExists = await checkMemberInRoom(id, uid);
   if (roomExists) {
     if (memberExists) {
       const oldMembers = roomExists.members;
@@ -355,11 +360,11 @@ export const leaveRoom = async ({ id, uid }) => {
       const newMembersId = oldMembersId.filter(
         (m_id) => m_id !== memberExists.uid
       );
-      const roomHasAdmins = checkRoomHasAdmins(id);
       return await updateDoc(roomDocRef, {
         members: [...newMembers],
         membersId: [...newMembersId],
       }).then(async () => {
+        const roomHasAdmins = checkRoomHasAdmins(id);
         if (!roomHasAdmins) {
           const randomMember = getRandomMember(id);
           await setAdminToRoom(id, randomMember.uid);
@@ -371,9 +376,9 @@ export const leaveRoom = async ({ id, uid }) => {
   } else return initialState.errorMessages.room_not_found;
 };
 
-export const deleteRoom = ({ id, uid }) => {
+export const deleteRoom = async ({ id, uid }) => {
   const roomDocRef = doc(getFirestore(), "rooms", id);
-  const memberExists = checkMemberInRoom(id, uid);
+  const memberExists = await checkMemberInRoom(id, uid);
   const memberIsAdmin = checkMemberIsAdmin(id, uid);
 
   if (memberExists) {
@@ -383,8 +388,8 @@ export const deleteRoom = ({ id, uid }) => {
   }
 };
 
-export const getRandomMember = (id) => {
-  const roomExists = checkRoomInDB(id);
+export const getRandomMember = async (id) => {
+  const roomExists = await checkRoomInDB(id);
 
   if (roomExists) {
     const roomLength = roomExists.membersId;
@@ -394,12 +399,12 @@ export const getRandomMember = (id) => {
 };
 
 export const checkRoomHasNoMembers = async (id) => {
-  const roomExists = checkRoomInDB(id);
+  const roomExists = await checkRoomInDB(id);
   return roomExists.membersId.length;
 };
 
 export const checkRoomHasAdmins = async (id) => {
-  const roomExists = checkRoomInDB(id);
+  const roomExists = await checkRoomInDB(id);
   const members = roomExists.members;
 
   const isAdmin = members.find((mem) => mem.isAdmin === true);
@@ -407,8 +412,8 @@ export const checkRoomHasAdmins = async (id) => {
 };
 
 export const checkMemberIsAdmin = async (id, uid) => {
-  const roomExists = checkRoomInDB(id);
-  const memberExists = checkMemberInRoom(id, uid);
+  const roomExists = await checkRoomInDB(id);
+  const memberExists = await checkMemberInRoom(id, uid);
 
   if (memberExists) {
     const oldMembers = roomExists.members;
@@ -417,28 +422,50 @@ export const checkMemberIsAdmin = async (id, uid) => {
   }
 };
 
-export const setAdminToRoom = async ({ id, uid }) => {
-  const roomExists = checkRoomInDB(id);
-  const userExists = checkUserInDB(uid);
-  const memberExists = checkMemberInRoom(id, uid);
+export const setNotAdminToRoom = async ({ id, uid }) => {
+  const roomDocRef = doc(getFirestore(), "rooms", id);
+  const roomExists = await checkRoomInDB(id);
+  const memberExists = await checkMemberInRoom(id, uid);
 
   if (roomExists) {
-    if (userExists) {
-      if (memberExists) {
-        const oldMembers = roomExists.members;
+    if (memberExists) {
+      const oldMembers = roomExists.members;
+      const newMembers = oldMembers.map((mem) => {
+        if (mem.uid === memberExists.uid) {
+          return {
+            ...mem,
+            isAdmin: false,
+          };
+        }
+        return mem;
+      });
+      return await updateDoc(roomDocRef, {
+        members: [...newMembers],
+      });
+    }
+  }
+};
 
-        const newMembers = oldMembers.map((mem) => {
-          if (mem.uid === memberExists.uid) {
-            return {
-              ...mem,
-              isAdmin: true,
-            };
-          }
-          return mem;
-        });
+export const setAdminToRoom = async ({ id, uid }) => {
+  const roomDocRef = doc(getFirestore(), "rooms", id);
+  const roomExists = await checkRoomInDB(id);
+  const memberExists = await checkMemberInRoom(id, uid);
 
-        // update room
-      }
+  if (roomExists) {
+    if (memberExists) {
+      const oldMembers = roomExists.members;
+      const newMembers = oldMembers.map((mem) => {
+        if (mem.uid === memberExists.uid) {
+          return {
+            ...mem,
+            isAdmin: true,
+          };
+        }
+        return mem;
+      });
+      return await updateDoc(roomDocRef, {
+        members: [...newMembers],
+      });
     }
   }
 };
@@ -450,8 +477,8 @@ export const checkRoomInDB = async (id) => {
 };
 
 export const checkMemberInRoom = async (id, uid) => {
-  const roomExists = checkRoomInDB(id);
-  const userExists = checkUserInDB(uid);
+  const roomExists = await checkRoomInDB(id);
+  const userExists = await checkUserInDB(uid);
 
   if (roomExists) {
     if (userExists) {

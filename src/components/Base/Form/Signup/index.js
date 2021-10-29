@@ -6,6 +6,7 @@ import {
   ACTIONS,
   DispatchContext,
   StateContext,
+  addUserToDB,
 } from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
@@ -24,8 +25,12 @@ export default function SignupForm({ onSwitch }) {
     await registerWithEmailAndPassword({
       ...state.signupForm,
     })
-      .then(() => {
+      .then(async (cred) => {
         setLoading(false);
+        await addUserToDB({
+          uid: cred.user.uid,
+          uname: state.signupForm.uname,
+        });
         dispatch({ type: ACTIONS.reset_signup_form });
       })
       .catch((err) => {

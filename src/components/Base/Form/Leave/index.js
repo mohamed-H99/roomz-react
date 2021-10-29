@@ -1,6 +1,9 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { StateContext, leaveRoom } from "../../../../storeProvider";
+import {
+  StateContext,
+  removeMemberFromRoomById,
+} from "../../../../storeProvider";
 import Button from "../../Button";
 import "./style.css";
 
@@ -19,7 +22,7 @@ export default function LeaveForm({ onDiscard }) {
   const handleLeave = async (e) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, loading: true }));
-    await leaveRoom({
+    await removeMemberFromRoomById({
       id: activeRoom?.id,
       reason: state.formData.reason,
       uid: currentUser?.uid,

@@ -1,5 +1,5 @@
 .chat-box {
-  @apply bg-gray-lightest w-screen max-w-full h-screen pl-0 md:pl-60 lg:pl-80 p-0 h-screen overflow-hidden relative;
+  @apply bg-gray-lightest w-full max-w-full h-full pl-0 md:pl-60 lg:pl-80 p-0 overflow-hidden relative;
 }
 
 .chat-box__wrapper {
